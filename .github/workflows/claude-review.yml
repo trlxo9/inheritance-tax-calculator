@@ -1,0 +1,95 @@
+name: Claude Code PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  id-token: write
+  actions: read
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'pull_request' && github.actor != 'dependabot[bot]') ||
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request)
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect Languages
+        id: detect-lang
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          primary=$(gh api repos/${{ github.repository }} --jq '.language // "TypeScript"')
+          echo "primary_language=$primary" >> $GITHUB_OUTPUT
+
+      - name: Get PR Number
+        id: pr-number
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+          else
+            echo "number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
+          fi
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          trigger_phrase: "@claude"
+          label_trigger: "claude"
+          branch_prefix: "claude/"
+          use_sticky_comment: true
+          use_commit_signing: false
+          bot_id: 41898282
+          bot_name: "claude[bot]"
+          track_progress: true
+          claude_args: "--allowedTools 'Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Read,Glob,Grep'"
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ steps.pr-number.outputs.number }}
+
+            Review this ${{ steps.detect-lang.outputs.primary_language }} pull request and POST YOUR REVIEW AS A PR COMMENT.
+
+            ## How to Post Your Review
+            IMPORTANT: You MUST post your review using this command:
+            ```
+            gh pr comment ${{ steps.pr-number.outputs.number }} --body "YOUR REVIEW HERE"
+            ```
+            Do NOT just output text - the review must be posted as a GitHub comment.
+
+            ## Security and Correctness (Must Fix)
+            Check for:
+            - Numeric precision or rounding issues (Decimal usage and edge cases)
+            - Tax-rule regressions versus fixture expectations
+            - Broken validation paths and malformed fixture handling
+            - Data exposure/secrets and unsafe dependency usage
+
+            ## Code Quality Review
+            Assess:
+            - Consistency with existing TypeScript patterns
+            - Error handling and edge cases
+            - Test coverage for changes, especially integration fixtures
+            - Clarity of names, comments, and docs
+
+            ## Review Guidelines
+            - Be constructive and actionable
+            - Explain why each issue matters
+            - Describe user or compliance impact
+            - Prioritize correctness and security first
+            - Provide file:line references where possible
+
+            $(cat .github/claude-review-focus.md 2>/dev/null || echo "")
+
+            Format your comment with:
+            1. Summary of reviewed changes
+            2. Security/correctness findings
+            3. Code quality observations
+            4. Specific recommendations
