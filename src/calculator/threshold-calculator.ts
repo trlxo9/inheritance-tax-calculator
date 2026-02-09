@@ -1,6 +1,6 @@
 import { Decimal } from 'decimal.js';
 import type { TaxYearConfig } from '../config/tax-years';
-import type { Estate, LifetimeGift } from '../types';
+import type { ChargeableGiftSummary, Estate, LifetimeGift } from '../types';
 
 function decimalZero(): Decimal {
   return new Decimal(0);
@@ -71,10 +71,12 @@ function calculateGiftImpact(
   availableNrb: Decimal,
   standardRate: Decimal,
 ): {
+  totalGiftsIn7Years: Decimal;
   nrbUsedByGifts: Decimal;
   nrbRemainingForEstate: Decimal;
   giftTaxableAmount: Decimal;
   giftTax: Decimal;
+  chargeableGifts: ChargeableGiftSummary[];
 } {
   const chargeableGifts = gifts
     .filter((gift) => isChargeableGift(gift))
@@ -87,34 +89,58 @@ function calculateGiftImpact(
     .sort((a, b) => a.dateOfGift.getTime() - b.dateOfGift.getTime());
 
   let remainingNrb = new Decimal(availableNrb);
+  let totalGiftsIn7Years = decimalZero();
   let totalGiftTaxable = decimalZero();
   let totalGiftTax = decimalZero();
+  const giftBreakdown: ChargeableGiftSummary[] = [];
 
   for (const { gift, dateOfGift, value } of chargeableGifts) {
-    const coveredByNrb = Decimal.min(value, remainingNrb);
+    totalGiftsIn7Years = totalGiftsIn7Years.add(value);
+
+    const annualExemptionApplied = decimalZero();
+    const chargeableValue = Decimal.max(value.sub(annualExemptionApplied), decimalZero());
+    const coveredByNrb = Decimal.min(chargeableValue, remainingNrb);
     remainingNrb = Decimal.max(remainingNrb.sub(coveredByNrb), decimalZero());
 
-    const taxableOnGift = Decimal.max(value.sub(coveredByNrb), decimalZero());
+    const taxableOnGift = Decimal.max(chargeableValue.sub(coveredByNrb), decimalZero());
+    const yearsBeforeDeath = yearsBetween(dateOfGift, deathDate);
+    const giftRate = taxableOnGift.gt(0)
+      ? getGiftTaxRate(yearsBeforeDeath, standardRate)
+      : decimalZero();
+    let taxDue = taxableOnGift.mul(giftRate).div(100);
+
     if (taxableOnGift.gt(0)) {
-      const yearsBeforeDeath = yearsBetween(dateOfGift, deathDate);
-      const giftRate = getGiftTaxRate(yearsBeforeDeath, standardRate);
       totalGiftTaxable = totalGiftTaxable.add(taxableOnGift);
-      totalGiftTax = totalGiftTax.add(taxableOnGift.mul(giftRate).div(100));
     }
 
     if (gift.giftType === 'clt') {
       const paidAtTransfer = gift.taxPaidAtTransfer ?? decimalZero();
       if (paidAtTransfer.gt(0)) {
-        totalGiftTax = Decimal.max(totalGiftTax.sub(paidAtTransfer), decimalZero());
+        taxDue = Decimal.max(taxDue.sub(paidAtTransfer), decimalZero());
       }
     }
+
+    totalGiftTax = totalGiftTax.add(taxDue);
+    giftBreakdown.push({
+      giftId: gift.id,
+      date: dateOfGift,
+      grossValue: value,
+      annualExemptionApplied,
+      chargeableValue,
+      yearsBeforeDeath,
+      taperRate: giftRate,
+      taxDue,
+      paidBy: taxDue.gt(0) ? 'recipient' : 'estate',
+    });
   }
 
   return {
+    totalGiftsIn7Years,
     nrbUsedByGifts: Decimal.max(availableNrb.sub(remainingNrb), decimalZero()),
     nrbRemainingForEstate: remainingNrb,
     giftTaxableAmount: totalGiftTaxable,
     giftTax: totalGiftTax,
+    chargeableGifts: giftBreakdown,
   };
 }
 
@@ -131,6 +157,7 @@ export interface ThresholdResult {
   basicNrb: Decimal;
   transferredNrb: Decimal;
   totalNrb: Decimal;
+  totalGiftsIn7Years: Decimal;
   nrbUsedByGifts: Decimal;
   nrbRemainingForEstate: Decimal;
   grossRnrb: Decimal;
@@ -140,6 +167,7 @@ export interface ThresholdResult {
   availableThreshold: Decimal;
   giftTaxableAmount: Decimal;
   giftTax: Decimal;
+  chargeableGifts: ChargeableGiftSummary[];
   estateTaxableAmount: Decimal;
   estateTax: Decimal;
   totalTaxPayable: Decimal;
@@ -176,6 +204,7 @@ export function calculateThresholds(input: ThresholdInput): ThresholdResult {
     basicNrb: input.basicNrb,
     transferredNrb,
     totalNrb,
+    totalGiftsIn7Years: giftImpact.totalGiftsIn7Years,
     nrbUsedByGifts: giftImpact.nrbUsedByGifts,
     nrbRemainingForEstate: giftImpact.nrbRemainingForEstate,
     grossRnrb,
@@ -185,6 +214,7 @@ export function calculateThresholds(input: ThresholdInput): ThresholdResult {
     availableThreshold,
     giftTaxableAmount: giftImpact.giftTaxableAmount,
     giftTax: giftImpact.giftTax,
+    chargeableGifts: giftImpact.chargeableGifts,
     estateTaxableAmount,
     estateTax,
     totalTaxPayable,

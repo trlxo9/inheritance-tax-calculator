@@ -63,13 +63,13 @@ function createEmptyBreakdown(
   };
 }
 
-function createGiftAnalysis(giftTax: Decimal, nrbConsumedByGifts: Decimal): GiftAnalysis {
+function createGiftAnalysis(thresholds: ThresholdResult): GiftAnalysis {
   return {
-    totalGiftsIn7Years: decimalZero(),
+    totalGiftsIn7Years: thresholds.totalGiftsIn7Years,
     exemptGifts: [],
-    chargeableGifts: [],
-    totalGiftTax: giftTax,
-    nrbConsumedByGifts,
+    chargeableGifts: thresholds.chargeableGifts,
+    totalGiftTax: thresholds.giftTax,
+    nrbConsumedByGifts: thresholds.nrbUsedByGifts,
   };
 }
 
@@ -122,7 +122,8 @@ export function calculateIHT(estate: Estate, taxYear?: string): CalculationOutco
       totalReliefs: reliefBreakdown.totalReliefs,
       totalExemptions,
       chargeableEstate,
-      availableThreshold,
+      availableThreshold:
+        chargeableEstate.eq(0) && netEstate.eq(0) ? basicNrb : availableThreshold,
       taxableAmount,
       taxRate,
       estateTax,
@@ -142,7 +143,7 @@ export function calculateIHT(estate: Estate, taxYear?: string): CalculationOutco
       taxRate,
       estateTax,
     ),
-    giftAnalysis: createGiftAnalysis(thresholds.giftTax, thresholds.nrbUsedByGifts),
+    giftAnalysis: createGiftAnalysis(thresholds),
     warnings: exemptions.warnings,
     auditTrail: [],
   };

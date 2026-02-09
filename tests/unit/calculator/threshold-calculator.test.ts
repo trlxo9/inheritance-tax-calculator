@@ -308,4 +308,82 @@ describe('Threshold Calculator', () => {
     expect(result.giftTaxableAmount).toEqual(new Decimal(175000));
     expect(result.giftTax).toEqual(new Decimal(60000));
   });
+
+  test("should calculate PET taper for Julia's 3-4 year gift example", () => {
+    const estate = createEstate({
+      deceased: {
+        dateOfDeath: new Date('2012-06-20'),
+        domicileStatus: { type: 'uk_domiciled' },
+        maritalStatus: { type: 'single' },
+        hasDirectDescendants: false,
+      },
+      gifts: [
+        {
+          id: 'gift-1',
+          giftType: 'pet',
+          dateOfGift: new Date('2009-02-01'),
+          value: new Decimal(375000),
+          recipient: { type: 'individual', name: 'Beneficiary' },
+          description: 'Gift',
+          isGiftWithReservation: false,
+          petStatus: 'failed',
+        },
+      ],
+    });
+
+    const result = calculateThresholds({
+      estate,
+      netEstate: new Decimal(0),
+      chargeableEstate: new Decimal(0),
+      basicNrb: new Decimal(325000),
+      taxYearConfig: getTaxYearConfig('2012-13'),
+      taxRate: new Decimal(40),
+    });
+
+    expect(result.giftTaxableAmount).toEqual(new Decimal(50000));
+    expect(result.giftTax).toEqual(new Decimal(16000));
+    expect(result.nrbRemainingForEstate).toEqual(new Decimal(0));
+    expect(result.chargeableGifts).toHaveLength(1);
+    expect(result.chargeableGifts[0].taperRate).toEqual(new Decimal(32));
+    expect(result.chargeableGifts[0].taxDue).toEqual(new Decimal(16000));
+    expect(result.chargeableGifts[0].paidBy).toBe('recipient');
+  });
+
+  test('should not apply taper when PET does not exceed NRB', () => {
+    const estate = createEstate({
+      deceased: {
+        dateOfDeath: new Date('2012-06-20'),
+        domicileStatus: { type: 'uk_domiciled' },
+        maritalStatus: { type: 'single' },
+        hasDirectDescendants: false,
+      },
+      gifts: [
+        {
+          id: 'gift-1',
+          giftType: 'pet',
+          dateOfGift: new Date('2009-02-01'),
+          value: new Decimal(300000),
+          recipient: { type: 'individual', name: 'Child' },
+          description: 'Gift',
+          isGiftWithReservation: false,
+          petStatus: 'failed',
+        },
+      ],
+    });
+
+    const result = calculateThresholds({
+      estate,
+      netEstate: new Decimal(0),
+      chargeableEstate: new Decimal(0),
+      basicNrb: new Decimal(325000),
+      taxYearConfig: getTaxYearConfig('2012-13'),
+      taxRate: new Decimal(40),
+    });
+
+    expect(result.giftTax).toEqual(new Decimal(0));
+    expect(result.nrbRemainingForEstate).toEqual(new Decimal(25000));
+    expect(result.chargeableGifts).toHaveLength(1);
+    expect(result.chargeableGifts[0].taperRate).toEqual(new Decimal(0));
+    expect(result.chargeableGifts[0].taxDue).toEqual(new Decimal(0));
+  });
 });
