@@ -44,6 +44,26 @@ interface RawFixtureInput {
   }) | null;
 }
 
+type RawGift = {
+  id: string;
+  giftType: 'pet' | 'clt' | 'exempt';
+  dateOfGift: string;
+  value: string;
+  recipient: {
+    type: 'individual' | 'trust' | 'charity' | 'company';
+    name: string;
+    relationship?: string;
+  };
+  description: string;
+  isGiftWithReservation: boolean;
+  reservationEndDate?: string;
+  petStatus?: 'potentially_exempt' | 'failed' | 'exempt';
+  trustDetails?: { trustType: string; trustId: string };
+  taxPaidAtTransfer?: string;
+  paidByDonor?: boolean;
+  exemptionType?: string;
+};
+
 interface Fixture {
   input: RawFixtureInput;
   expectedOutput: Record<string, string>;
@@ -59,6 +79,64 @@ export async function loadFixture(relativePath: string): Promise<Fixture> {
 }
 
 export function convertFixtureToInput(fixtureInput: RawFixtureInput): Estate {
+  const convertedGifts = (fixtureInput.gifts as unknown as RawGift[]).map((gift) => {
+    const base = {
+      ...gift,
+      dateOfGift: new Date(gift.dateOfGift),
+      value: new Decimal(gift.value),
+      reservationEndDate: gift.reservationEndDate ? new Date(gift.reservationEndDate) : undefined,
+    };
+
+    if (gift.giftType === 'pet') {
+      return {
+        ...base,
+        giftType: 'pet' as const,
+        petStatus: gift.petStatus ?? 'potentially_exempt',
+      };
+    }
+
+    if (gift.giftType === 'clt') {
+      return {
+        ...base,
+        giftType: 'clt' as const,
+        trustDetails: gift.trustDetails
+          ? {
+              trustType: gift.trustDetails.trustType as
+                | 'ipdi'
+                | 'life_interest'
+                | 'discretionary'
+                | 'bare_trust'
+                | 'disabled_trust'
+                | 'bereaved_minor'
+                | 'age_18_to_25',
+              trustId: gift.trustDetails.trustId,
+            }
+          : {
+              trustType: 'discretionary' as const,
+              trustId: `trust-${gift.id}`,
+            },
+        taxPaidAtTransfer: new Decimal(gift.taxPaidAtTransfer ?? '0'),
+        paidByDonor: gift.paidByDonor ?? false,
+      };
+    }
+
+    return {
+      ...base,
+      giftType: 'exempt' as const,
+      exemptionType: (gift.exemptionType ?? 'annual_exemption') as
+        | 'spouse'
+        | 'charity'
+        | 'small_gift'
+        | 'annual_exemption'
+        | 'wedding_child'
+        | 'wedding_grandchild'
+        | 'wedding_other'
+        | 'normal_expenditure'
+        | 'political_party'
+        | 'national_benefit',
+    };
+  });
+
   return {
     deceased: {
       ...fixtureInput.deceased,
@@ -77,7 +155,7 @@ export function convertFixtureToInput(fixtureInput: RawFixtureInput): Estate {
           amount: new Decimal(liability.amount),
         }) as Liability,
     ),
-    gifts: fixtureInput.gifts,
+    gifts: convertedGifts,
     beneficiaries: fixtureInput.beneficiaries.map((beneficiary) => ({
       ...beneficiary,
       residuaryShare:

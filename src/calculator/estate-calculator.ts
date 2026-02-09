@@ -3,34 +3,12 @@ import type { CalculationBreakdown, CalculationOutcome, Estate, GiftAnalysis } f
 import { getTaxYearConfig, getTaxYearForDate } from '../config/tax-years';
 import { calculateExemptions } from '../rules/exemption-rules';
 import { applyReliefs } from '../rules/relief-rules';
-import { calculateBasicTax } from './basic-tax';
 import { calculateGrossEstate } from './gross-estate';
 import { deductLiabilities } from './liabilities';
+import { calculateThresholds, type ThresholdResult } from './threshold-calculator';
 
 function decimalZero(): Decimal {
   return new Decimal(0);
-}
-
-function calculateAppliedRnrb(estate: Estate, netEstate: Decimal, maxRnrb: Decimal): Decimal {
-  if (!estate.residence) {
-    return decimalZero();
-  }
-
-  if (!estate.deceased.hasDirectDescendants || !estate.residence.passingToDirectDescendants) {
-    return decimalZero();
-  }
-
-  const residenceToDescendants = estate.residence.value.mul(estate.residence.descendantShare).div(100);
-  let appliedRnrb = Decimal.min(maxRnrb, residenceToDescendants);
-
-  const config = getTaxYearConfig(getTaxYearForDate(estate.deceased.dateOfDeath));
-  const taperThreshold = new Decimal(config.rnrbTaperThreshold);
-  if (netEstate.gt(taperThreshold)) {
-    const reduction = netEstate.sub(taperThreshold).div(2);
-    appliedRnrb = Decimal.max(appliedRnrb.sub(reduction), decimalZero());
-  }
-
-  return appliedRnrb;
 }
 
 function createEmptyBreakdown(
@@ -38,11 +16,9 @@ function createEmptyBreakdown(
   netEstate: Decimal,
   reliefBreakdown: CalculationBreakdown['reliefApplication'],
   exemptionBreakdown: CalculationBreakdown['exemptionApplication'],
-  nrbAfterSpouseCap: Decimal,
-  basicNrb: Decimal,
-  appliedRnrb: Decimal,
+  thresholds: ThresholdResult,
   chargeableEstate: Decimal,
-  threshold: Decimal,
+  availableThreshold: Decimal,
   taxableAmount: Decimal,
   taxRate: Decimal,
   estateTax: Decimal,
@@ -64,19 +40,19 @@ function createEmptyBreakdown(
     reliefApplication: reliefBreakdown,
     exemptionApplication: exemptionBreakdown,
     thresholdCalculation: {
-      basicNrb,
-      transferredNrb: decimalZero(),
-      totalNrb: nrbAfterSpouseCap,
-      grossRnrb: appliedRnrb,
-      transferredRnrb: decimalZero(),
-      taperReduction: decimalZero(),
-      netRnrb: appliedRnrb,
-      nrbUsedByGifts: decimalZero(),
-      remainingThreshold: threshold,
+      basicNrb: thresholds.basicNrb,
+      transferredNrb: thresholds.transferredNrb,
+      totalNrb: thresholds.totalNrb,
+      grossRnrb: thresholds.grossRnrb,
+      transferredRnrb: thresholds.transferredRnrb,
+      taperReduction: thresholds.taperReduction,
+      netRnrb: thresholds.appliedRnrb,
+      nrbUsedByGifts: thresholds.nrbUsedByGifts,
+      remainingThreshold: availableThreshold,
     },
     taxCalculation: {
       chargeableEstate,
-      availableThreshold: threshold,
+      availableThreshold,
       taxableAmount,
       taxRate,
       charityRateApplies: taxRate.eq(36),
@@ -87,13 +63,13 @@ function createEmptyBreakdown(
   };
 }
 
-function createEmptyGiftAnalysis(): GiftAnalysis {
+function createGiftAnalysis(giftTax: Decimal, nrbConsumedByGifts: Decimal): GiftAnalysis {
   return {
     totalGiftsIn7Years: decimalZero(),
     exemptGifts: [],
     chargeableGifts: [],
-    totalGiftTax: decimalZero(),
-    nrbConsumedByGifts: decimalZero(),
+    totalGiftTax: giftTax,
+    nrbConsumedByGifts,
   };
 }
 
@@ -116,13 +92,19 @@ export function calculateIHT(estate: Estate, taxYear?: string): CalculationOutco
 
   const chargeableEstate = exemptions.chargeableEstate;
   const totalExemptions = exemptions.totalExemptions;
-  const nrbAfterSpouseCap = Decimal.max(basicNrb.sub(exemptions.nrbConsumedBySpouseExemption), decimalZero());
-  const appliedRnrb = calculateAppliedRnrb(estate, netEstate, new Decimal(config.residenceNilRateBand));
-  const availableThreshold = nrbAfterSpouseCap.add(appliedRnrb);
-
-  const taxableAmount = Decimal.max(chargeableEstate.sub(availableThreshold), decimalZero());
   const taxRate = exemptions.taxRate;
-  const estateTax = calculateBasicTax(chargeableEstate, availableThreshold, taxRate);
+  const thresholds = calculateThresholds({
+    estate,
+    netEstate,
+    chargeableEstate,
+    basicNrb: Decimal.max(basicNrb.sub(exemptions.nrbConsumedBySpouseExemption), decimalZero()),
+    taxYearConfig: config,
+    taxRate,
+  });
+
+  const availableThreshold = thresholds.availableThreshold;
+  const taxableAmount = thresholds.estateTaxableAmount;
+  const estateTax = thresholds.estateTax;
 
   const exemptionBreakdown: CalculationBreakdown['exemptionApplication'] = {
     spouseExemption: exemptions.spouseExemption,
@@ -144,25 +126,23 @@ export function calculateIHT(estate: Estate, taxYear?: string): CalculationOutco
       taxableAmount,
       taxRate,
       estateTax,
-      giftTax: decimalZero(),
+      giftTax: thresholds.giftTax,
       quickSuccessionRelief: decimalZero(),
-      totalTaxPayable: estateTax,
+      totalTaxPayable: thresholds.totalTaxPayable,
     },
     breakdown: createEmptyBreakdown(
       grossEstate,
       netEstate,
       reliefBreakdown,
       exemptionBreakdown,
-      nrbAfterSpouseCap,
-      basicNrb,
-      appliedRnrb,
+      thresholds,
       chargeableEstate,
       availableThreshold,
       taxableAmount,
       taxRate,
       estateTax,
     ),
-    giftAnalysis: createEmptyGiftAnalysis(),
+    giftAnalysis: createGiftAnalysis(thresholds.giftTax, thresholds.nrbUsedByGifts),
     warnings: exemptions.warnings,
     auditTrail: [],
   };

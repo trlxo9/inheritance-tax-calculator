@@ -24,4 +24,10 @@ describe('Tax year configuration', () => {
     expect(config.nilRateBand).toBe(325000);
     expect(config.residenceNilRateBand).toBe(175000);
   });
+
+  test('should return config for 2018-19', () => {
+    const config = getTaxYearConfig('2018-19');
+    expect(config.nilRateBand).toBe(325000);
+    expect(config.residenceNilRateBand).toBe(125000);
+  });
 });
