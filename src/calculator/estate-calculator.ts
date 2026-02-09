@@ -1,6 +1,7 @@
 import { Decimal } from 'decimal.js';
 import type { CalculationBreakdown, CalculationOutcome, Estate, GiftAnalysis } from '../types';
 import { getTaxYearConfig, getTaxYearForDate } from '../config/tax-years';
+import { applyReliefs } from '../rules/relief-rules';
 import { calculateBasicTax } from './basic-tax';
 import { calculateGrossEstate } from './gross-estate';
 import { deductLiabilities } from './liabilities';
@@ -89,6 +90,7 @@ function calculateAppliedRnrb(estate: Estate, netEstate: Decimal, maxRnrb: Decim
 function createEmptyBreakdown(
   grossEstate: Decimal,
   netEstate: Decimal,
+  reliefBreakdown: CalculationBreakdown['reliefApplication'],
   spouseExemption: Decimal,
   basicNrb: Decimal,
   appliedRnrb: Decimal,
@@ -112,13 +114,7 @@ function createEmptyBreakdown(
       funeralExpenses: decimalZero(),
       netTotal: netEstate,
     },
-    reliefApplication: {
-      bprDetails: [],
-      aprDetails: [],
-      totalBpr: decimalZero(),
-      totalApr: decimalZero(),
-      totalReliefs: decimalZero(),
-    },
+    reliefApplication: reliefBreakdown,
     exemptionApplication: {
       spouseExemption,
       charityExemption: decimalZero(),
@@ -166,10 +162,11 @@ export function calculateIHT(estate: Estate, taxYear?: string): CalculationOutco
 
   const grossEstate = calculateGrossEstate(estate);
   const netEstate = deductLiabilities(grossEstate, estate.liabilities);
+  const { valueAfterReliefs, reliefBreakdown } = applyReliefs(estate.assets, netEstate);
 
-  const spouseExemption = calculateSpouseExemption(estate, netEstate);
+  const spouseExemption = calculateSpouseExemption(estate, valueAfterReliefs);
   const totalExemptions = spouseExemption;
-  const chargeableEstate = Decimal.max(netEstate.sub(totalExemptions), decimalZero());
+  const chargeableEstate = Decimal.max(valueAfterReliefs.sub(totalExemptions), decimalZero());
 
   const basicNrb = new Decimal(config.nilRateBand);
   const appliedRnrb = calculateAppliedRnrb(estate, netEstate, new Decimal(config.residenceNilRateBand));
@@ -184,7 +181,7 @@ export function calculateIHT(estate: Estate, taxYear?: string): CalculationOutco
     summary: {
       grossEstate,
       netEstate,
-      totalReliefs: decimalZero(),
+      totalReliefs: reliefBreakdown.totalReliefs,
       totalExemptions,
       chargeableEstate,
       availableThreshold,
@@ -198,6 +195,7 @@ export function calculateIHT(estate: Estate, taxYear?: string): CalculationOutco
     breakdown: createEmptyBreakdown(
       grossEstate,
       netEstate,
+      reliefBreakdown,
       spouseExemption,
       basicNrb,
       appliedRnrb,

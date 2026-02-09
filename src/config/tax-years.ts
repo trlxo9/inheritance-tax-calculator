@@ -72,6 +72,24 @@ export const TAX_YEAR_CONFIGS: Record<string, TaxYearConfig> = {
     trustLifetimeRate: 20,
     trustPeriodicMaxRate: 6,
   },
+  '2021-22': {
+    year: '2021-22',
+    startDate: new Date('2021-04-06'),
+    endDate: new Date('2022-04-05'),
+    nilRateBand: 325000,
+    residenceNilRateBand: 175000,
+    rnrbTaperThreshold: 2000000,
+    standardRate: 40,
+    charityRate: 36,
+    annualExemption: 3000,
+    smallGiftLimit: 250,
+    weddingGiftChild: 5000,
+    weddingGiftGrandchild: 2500,
+    weddingGiftOther: 1000,
+    charityRateMinPercentage: 10,
+    trustLifetimeRate: 20,
+    trustPeriodicMaxRate: 6,
+  },
 };
 
 export function getTaxYearConfig(year: string): TaxYearConfig {
