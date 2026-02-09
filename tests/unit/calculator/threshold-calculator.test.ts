@@ -305,8 +305,8 @@ describe('Threshold Calculator', () => {
       taxRate: new Decimal(40),
     });
 
-    expect(result.giftTaxableAmount).toEqual(new Decimal(175000));
-    expect(result.giftTax).toEqual(new Decimal(60000));
+    expect(result.giftTaxableAmount).toEqual(new Decimal(218750));
+    expect(result.giftTax).toEqual(new Decimal(77500));
   });
 
   test("should calculate PET taper for Julia's 3-4 year gift example", () => {
@@ -385,5 +385,228 @@ describe('Threshold Calculator', () => {
     expect(result.chargeableGifts).toHaveLength(1);
     expect(result.chargeableGifts[0].taperRate).toEqual(new Decimal(0));
     expect(result.chargeableGifts[0].taxDue).toEqual(new Decimal(0));
+  });
+
+  test('should gross up donor-paid CLT when value is net of tax', () => {
+    const estate = createEstate({
+      deceased: {
+        dateOfDeath: new Date('2024-01-15'),
+        domicileStatus: { type: 'uk_domiciled' },
+        maritalStatus: { type: 'single' },
+        hasDirectDescendants: false,
+      },
+      gifts: [
+        {
+          id: 'gift-1',
+          giftType: 'clt',
+          dateOfGift: new Date('2018-06-01'),
+          value: new Decimal(400000),
+          recipient: { type: 'trust', name: 'Trust' },
+          description: 'CLT',
+          isGiftWithReservation: false,
+          trustDetails: {
+            trustType: 'discretionary',
+            trustId: 'trust-1',
+          },
+          taxPaidAtTransfer: new Decimal(18750),
+          paidByDonor: true,
+        },
+      ],
+    });
+
+    const result = calculateThresholds({
+      estate,
+      netEstate: new Decimal(0),
+      chargeableEstate: new Decimal(0),
+      basicNrb: new Decimal(325000),
+      taxYearConfig: getTaxYearConfig('2023-24'),
+      taxRate: new Decimal(40),
+    });
+
+    expect(result.chargeableGifts).toHaveLength(1);
+    expect(result.chargeableGifts[0].grossValue).toEqual(new Decimal(418750));
+    expect(result.giftTax).toEqual(new Decimal(0));
+  });
+
+  test('should calculate CLT death top-up after crediting lifetime tax', () => {
+    const estate = createEstate({
+      deceased: {
+        dateOfDeath: new Date('2023-01-15'),
+        domicileStatus: { type: 'uk_domiciled' },
+        maritalStatus: { type: 'single' },
+        hasDirectDescendants: false,
+      },
+      gifts: [
+        {
+          id: 'gift-1',
+          giftType: 'clt',
+          dateOfGift: new Date('2018-06-15'),
+          value: new Decimal(418750),
+          recipient: { type: 'trust', name: 'Trust' },
+          description: 'CLT',
+          isGiftWithReservation: false,
+          trustDetails: {
+            trustType: 'discretionary',
+            trustId: 'trust-1',
+          },
+          taxPaidAtTransfer: new Decimal(18750),
+          paidByDonor: true,
+        },
+      ],
+    });
+
+    const result = calculateThresholds({
+      estate,
+      netEstate: new Decimal(50000),
+      chargeableEstate: new Decimal(50000),
+      basicNrb: new Decimal(325000),
+      taxYearConfig: getTaxYearConfig('2023-24'),
+      taxRate: new Decimal(40),
+    });
+
+    expect(result.giftTax).toEqual(new Decimal(3750));
+    expect(result.chargeableGifts[0].taxDue).toEqual(new Decimal(3750));
+    expect(result.chargeableGifts[0].taperRate).toEqual(new Decimal(24));
+    expect(result.estateTax).toEqual(new Decimal(0));
+    expect(result.totalTaxPayable).toEqual(new Decimal(3750));
+  });
+
+  test('should apply 14-year lookback where prior CLT reduces NRB for PET', () => {
+    const estate = createEstate({
+      deceased: {
+        dateOfDeath: new Date('2023-06-01'),
+        domicileStatus: { type: 'uk_domiciled' },
+        maritalStatus: { type: 'single' },
+        hasDirectDescendants: false,
+      },
+      gifts: [
+        {
+          id: 'gift-1',
+          giftType: 'clt',
+          dateOfGift: new Date('2013-03-15'),
+          value: new Decimal(200000),
+          recipient: { type: 'trust', name: 'Trust' },
+          description: 'CLT',
+          isGiftWithReservation: false,
+          trustDetails: {
+            trustType: 'discretionary',
+            trustId: 'trust-1',
+          },
+          taxPaidAtTransfer: new Decimal(0),
+          paidByDonor: false,
+        },
+        {
+          id: 'gift-2',
+          giftType: 'pet',
+          dateOfGift: new Date('2019-09-10'),
+          value: new Decimal(400000),
+          recipient: { type: 'individual', name: 'Daughter' },
+          description: 'PET',
+          isGiftWithReservation: false,
+          petStatus: 'failed',
+        },
+      ],
+    });
+
+    const result = calculateThresholds({
+      estate,
+      netEstate: new Decimal(0),
+      chargeableEstate: new Decimal(0),
+      basicNrb: new Decimal(325000),
+      taxYearConfig: getTaxYearConfig('2023-24'),
+      taxRate: new Decimal(40),
+    });
+
+    expect(result.chargeableGifts).toHaveLength(1);
+    expect(result.chargeableGifts[0].giftId).toBe('gift-2');
+    expect(result.chargeableGifts[0].taxDue).toEqual(new Decimal(88000));
+    expect(result.giftTax).toEqual(new Decimal(88000));
+    expect(result.totalTaxPayable).toEqual(new Decimal(88000));
+  });
+
+  test('should keep CLT transfer unchanged when donor-paid CLT does not exceed NRB', () => {
+    const estate = createEstate({
+      deceased: {
+        dateOfDeath: new Date('2024-01-15'),
+        domicileStatus: { type: 'uk_domiciled' },
+        maritalStatus: { type: 'single' },
+        hasDirectDescendants: false,
+      },
+      gifts: [
+        {
+          id: 'gift-1',
+          giftType: 'clt',
+          dateOfGift: new Date('2019-01-01'),
+          value: new Decimal(300000),
+          recipient: { type: 'trust', name: 'Trust' },
+          description: 'CLT',
+          isGiftWithReservation: false,
+          trustDetails: {
+            trustType: 'discretionary',
+            trustId: 'trust-1',
+          },
+          taxPaidAtTransfer: new Decimal(0),
+          paidByDonor: true,
+        },
+      ],
+    });
+
+    const result = calculateThresholds({
+      estate,
+      netEstate: new Decimal(0),
+      chargeableEstate: new Decimal(0),
+      basicNrb: new Decimal(325000),
+      taxYearConfig: getTaxYearConfig('2023-24'),
+      taxRate: new Decimal(40),
+    });
+
+    expect(result.chargeableGifts[0].grossValue).toEqual(new Decimal(300000));
+    expect(result.giftTax).toEqual(new Decimal(0));
+  });
+
+  test('should process gifts in chronological order for tax calculations', () => {
+    const estate = createEstate({
+      deceased: {
+        dateOfDeath: new Date('2020-11-10'),
+        domicileStatus: { type: 'uk_domiciled' },
+        maritalStatus: { type: 'single' },
+        hasDirectDescendants: false,
+      },
+      gifts: [
+        {
+          id: 'gift-later',
+          giftType: 'pet',
+          dateOfGift: new Date('2019-06-01'),
+          value: new Decimal(300000),
+          recipient: { type: 'individual', name: 'Later' },
+          description: 'Later gift',
+          isGiftWithReservation: false,
+          petStatus: 'failed',
+        },
+        {
+          id: 'gift-earlier',
+          giftType: 'pet',
+          dateOfGift: new Date('2018-06-01'),
+          value: new Decimal(200000),
+          recipient: { type: 'individual', name: 'Earlier' },
+          description: 'Earlier gift',
+          isGiftWithReservation: false,
+          petStatus: 'failed',
+        },
+      ],
+    });
+
+    const result = calculateThresholds({
+      estate,
+      netEstate: new Decimal(0),
+      chargeableEstate: new Decimal(0),
+      basicNrb: new Decimal(325000),
+      taxYearConfig: getTaxYearConfig('2020-21'),
+      taxRate: new Decimal(40),
+    });
+
+    expect(result.chargeableGifts).toHaveLength(2);
+    expect(result.chargeableGifts[0].giftId).toBe('gift-earlier');
+    expect(result.chargeableGifts[1].giftId).toBe('gift-later');
   });
 });

@@ -36,4 +36,10 @@ describe('Tax year configuration', () => {
     expect(config.nilRateBand).toBe(325000);
     expect(config.residenceNilRateBand).toBe(0);
   });
+
+  test('should return config for 2023-24', () => {
+    const config = getTaxYearConfig('2023-24');
+    expect(config.nilRateBand).toBe(325000);
+    expect(config.residenceNilRateBand).toBe(175000);
+  });
 });

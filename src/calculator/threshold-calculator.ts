@@ -65,6 +65,78 @@ function calculateTransferredRnrb(estate: Estate): Decimal {
     .div(100);
 }
 
+interface NormalizedGift {
+  gift: LifetimeGift;
+  dateOfGift: Date;
+  value: Decimal;
+}
+
+function normalizeChargeableGifts(gifts: LifetimeGift[]): NormalizedGift[] {
+  return gifts
+    .filter((gift) => isChargeableGift(gift))
+    .map((gift) => ({
+      gift,
+      dateOfGift: normalizeGiftDate(gift),
+      value: normalizeGiftValue(gift),
+    }))
+    .sort((a, b) => a.dateOfGift.getTime() - b.dateOfGift.getTime());
+}
+
+function computeCltTransferValue(
+  value: Decimal,
+  availableNrb: Decimal,
+  lifetimeRate: Decimal,
+  taxPaidAtTransfer: Decimal,
+  paidByDonor: boolean,
+): Decimal {
+  if (!paidByDonor) {
+    return value;
+  }
+
+  const excessOverNrb = Decimal.max(value.sub(availableNrb), decimalZero());
+  if (excessOverNrb.eq(0)) {
+    return value;
+  }
+
+  const expectedTaxIfAlreadyGrossed = excessOverNrb.mul(lifetimeRate).div(100);
+  if (taxPaidAtTransfer.eq(expectedTaxIfAlreadyGrossed)) {
+    return value;
+  }
+
+  const grossingDenominator = new Decimal(1).sub(lifetimeRate.div(100));
+  const grossedExcess = excessOverNrb.div(grossingDenominator);
+  return availableNrb.add(grossedExcess);
+}
+
+function calculatePriorCltUsageForPet(
+  normalizedGifts: NormalizedGift[],
+  petDate: Date,
+  availableNrb: Decimal,
+  lifetimeRate: Decimal,
+): Decimal {
+  return normalizedGifts
+    .filter(({ gift, dateOfGift }) => {
+      return (
+        gift.giftType === 'clt' &&
+        dateOfGift.getTime() < petDate.getTime() &&
+        yearsBetween(dateOfGift, petDate) < 7
+      );
+    })
+    .reduce((sum, { gift, value }) => {
+      if (gift.giftType !== 'clt') {
+        return sum;
+      }
+      const cltTransferValue = computeCltTransferValue(
+        value,
+        availableNrb,
+        lifetimeRate,
+        gift.taxPaidAtTransfer ?? decimalZero(),
+        gift.paidByDonor ?? false,
+      );
+      return sum.add(cltTransferValue);
+    }, decimalZero());
+}
+
 function calculateGiftImpact(
   gifts: LifetimeGift[],
   deathDate: Date,
@@ -78,13 +150,9 @@ function calculateGiftImpact(
   giftTax: Decimal;
   chargeableGifts: ChargeableGiftSummary[];
 } {
-  const chargeableGifts = gifts
-    .filter((gift) => isChargeableGift(gift))
-    .map((gift) => ({
-      gift,
-      dateOfGift: normalizeGiftDate(gift),
-      value: normalizeGiftValue(gift),
-    }))
+  const lifetimeRate = new Decimal(20);
+  const normalizedChargeableGifts = normalizeChargeableGifts(gifts);
+  const chargeableGiftsWithinSevenYears = normalizedChargeableGifts
     .filter(({ dateOfGift }) => yearsBetween(dateOfGift, deathDate) < 7)
     .sort((a, b) => a.dateOfGift.getTime() - b.dateOfGift.getTime());
 
@@ -94,13 +162,43 @@ function calculateGiftImpact(
   let totalGiftTax = decimalZero();
   const giftBreakdown: ChargeableGiftSummary[] = [];
 
-  for (const { gift, dateOfGift, value } of chargeableGifts) {
-    totalGiftsIn7Years = totalGiftsIn7Years.add(value);
+  for (const { gift, dateOfGift, value } of chargeableGiftsWithinSevenYears) {
+    const transferValue =
+      gift.giftType === 'clt'
+        ? computeCltTransferValue(
+            value,
+            availableNrb,
+            lifetimeRate,
+            gift.taxPaidAtTransfer ?? decimalZero(),
+            gift.paidByDonor ?? false,
+          )
+        : value;
+
+    totalGiftsIn7Years = totalGiftsIn7Years.add(transferValue);
 
     const annualExemptionApplied = decimalZero();
-    const chargeableValue = Decimal.max(value.sub(annualExemptionApplied), decimalZero());
-    const coveredByNrb = Decimal.min(chargeableValue, remainingNrb);
-    remainingNrb = Decimal.max(remainingNrb.sub(coveredByNrb), decimalZero());
+    const chargeableValue = Decimal.max(transferValue.sub(annualExemptionApplied), decimalZero());
+
+    const nrbForGiftTax =
+      gift.giftType === 'pet'
+        ? Decimal.max(
+            availableNrb.sub(
+              calculatePriorCltUsageForPet(
+                normalizedChargeableGifts,
+                dateOfGift,
+                availableNrb,
+                lifetimeRate,
+              ),
+            ),
+            decimalZero(),
+          )
+        : availableNrb;
+
+    const coveredByNrb = Decimal.min(chargeableValue, nrbForGiftTax);
+    if (gift.giftType === 'pet') {
+      const consumedByEstateThreshold = Decimal.min(chargeableValue, remainingNrb);
+      remainingNrb = Decimal.max(remainingNrb.sub(consumedByEstateThreshold), decimalZero());
+    }
 
     const taxableOnGift = Decimal.max(chargeableValue.sub(coveredByNrb), decimalZero());
     const yearsBeforeDeath = yearsBetween(dateOfGift, deathDate);
@@ -124,7 +222,7 @@ function calculateGiftImpact(
     giftBreakdown.push({
       giftId: gift.id,
       date: dateOfGift,
-      grossValue: value,
+      grossValue: transferValue,
       annualExemptionApplied,
       chargeableValue,
       yearsBeforeDeath,
