@@ -1,6 +1,7 @@
 import { Decimal } from 'decimal.js';
 import type { CalculationBreakdown, CalculationOutcome, Estate, GiftAnalysis } from '../types';
 import { getTaxYearConfig, getTaxYearForDate } from '../config/tax-years';
+import { calculateExemptions } from '../rules/exemption-rules';
 import { applyReliefs } from '../rules/relief-rules';
 import { calculateBasicTax } from './basic-tax';
 import { calculateGrossEstate } from './gross-estate';
@@ -8,61 +9,6 @@ import { deductLiabilities } from './liabilities';
 
 function decimalZero(): Decimal {
   return new Decimal(0);
-}
-
-function sumSpecificBequestsForBeneficiary(estate: Estate, beneficiaryId: string): Decimal {
-  const beneficiary = estate.beneficiaries.find((item) => item.id === beneficiaryId);
-  if (!beneficiary) {
-    return decimalZero();
-  }
-
-  return beneficiary.specificBequests.reduce((sum, bequest) => {
-    if (bequest.assetId) {
-      const asset = estate.assets.find((item) => item.id === bequest.assetId);
-      if (asset) {
-        return sum.add(asset.grossValue.mul(asset.ownershipShare).div(100));
-      }
-    }
-
-    if (bequest.cashAmount) {
-      return sum.add(bequest.cashAmount);
-    }
-
-    return sum;
-  }, decimalZero());
-}
-
-function calculateTotalSpecificBequests(estate: Estate): Decimal {
-  return estate.beneficiaries.reduce(
-    (sum, beneficiary) => sum.add(sumSpecificBequestsForBeneficiary(estate, beneficiary.id)),
-    decimalZero(),
-  );
-}
-
-function calculateSpouseExemption(estate: Estate, netEstate: Decimal): Decimal {
-  const spouseBeneficiaries = estate.beneficiaries.filter(
-    (beneficiary) => beneficiary.inheritanceType === 'exempt_spouse',
-  );
-
-  if (spouseBeneficiaries.length === 0) {
-    return decimalZero();
-  }
-
-  const spouseSpecific = spouseBeneficiaries.reduce(
-    (sum, beneficiary) => sum.add(sumSpecificBequestsForBeneficiary(estate, beneficiary.id)),
-    decimalZero(),
-  );
-
-  const spouseResiduaryPercent = spouseBeneficiaries.reduce(
-    (sum, beneficiary) => sum.add(beneficiary.residuaryShare ?? decimalZero()),
-    decimalZero(),
-  );
-
-  const totalSpecificAllBeneficiaries = calculateTotalSpecificBequests(estate);
-  const residue = Decimal.max(netEstate.sub(totalSpecificAllBeneficiaries), decimalZero());
-  const spouseResiduary = residue.mul(spouseResiduaryPercent).div(100);
-
-  return spouseSpecific.add(spouseResiduary);
 }
 
 function calculateAppliedRnrb(estate: Estate, netEstate: Decimal, maxRnrb: Decimal): Decimal {
@@ -91,7 +37,8 @@ function createEmptyBreakdown(
   grossEstate: Decimal,
   netEstate: Decimal,
   reliefBreakdown: CalculationBreakdown['reliefApplication'],
-  spouseExemption: Decimal,
+  exemptionBreakdown: CalculationBreakdown['exemptionApplication'],
+  nrbAfterSpouseCap: Decimal,
   basicNrb: Decimal,
   appliedRnrb: Decimal,
   chargeableEstate: Decimal,
@@ -115,17 +62,11 @@ function createEmptyBreakdown(
       netTotal: netEstate,
     },
     reliefApplication: reliefBreakdown,
-    exemptionApplication: {
-      spouseExemption,
-      charityExemption: decimalZero(),
-      otherExemptions: decimalZero(),
-      totalExemptions: spouseExemption,
-      spouseExemptionCapped: false,
-    },
+    exemptionApplication: exemptionBreakdown,
     thresholdCalculation: {
       basicNrb,
       transferredNrb: decimalZero(),
-      totalNrb: basicNrb,
+      totalNrb: nrbAfterSpouseCap,
       grossRnrb: appliedRnrb,
       transferredRnrb: decimalZero(),
       taperReduction: decimalZero(),
@@ -138,7 +79,7 @@ function createEmptyBreakdown(
       availableThreshold: threshold,
       taxableAmount,
       taxRate,
-      charityRateApplies: false,
+      charityRateApplies: taxRate.eq(36),
       grossTax: estateTax,
       quickSuccessionRelief: decimalZero(),
       netTax: estateTax,
@@ -163,18 +104,33 @@ export function calculateIHT(estate: Estate, taxYear?: string): CalculationOutco
   const grossEstate = calculateGrossEstate(estate);
   const netEstate = deductLiabilities(grossEstate, estate.liabilities);
   const { valueAfterReliefs, reliefBreakdown } = applyReliefs(estate.assets, netEstate);
-
-  const spouseExemption = calculateSpouseExemption(estate, valueAfterReliefs);
-  const totalExemptions = spouseExemption;
-  const chargeableEstate = Decimal.max(valueAfterReliefs.sub(totalExemptions), decimalZero());
-
   const basicNrb = new Decimal(config.nilRateBand);
+  const exemptions = calculateExemptions({
+    estate,
+    valueAfterReliefs,
+    nilRateBand: basicNrb,
+    standardRate: new Decimal(config.standardRate),
+    charityRate: new Decimal(config.charityRate),
+    charityRateMinPercentage: config.charityRateMinPercentage,
+  });
+
+  const chargeableEstate = exemptions.chargeableEstate;
+  const totalExemptions = exemptions.totalExemptions;
+  const nrbAfterSpouseCap = Decimal.max(basicNrb.sub(exemptions.nrbConsumedBySpouseExemption), decimalZero());
   const appliedRnrb = calculateAppliedRnrb(estate, netEstate, new Decimal(config.residenceNilRateBand));
-  const availableThreshold = basicNrb.add(appliedRnrb);
+  const availableThreshold = nrbAfterSpouseCap.add(appliedRnrb);
 
   const taxableAmount = Decimal.max(chargeableEstate.sub(availableThreshold), decimalZero());
-  const taxRate = new Decimal(config.standardRate);
+  const taxRate = exemptions.taxRate;
   const estateTax = calculateBasicTax(chargeableEstate, availableThreshold, taxRate);
+
+  const exemptionBreakdown: CalculationBreakdown['exemptionApplication'] = {
+    spouseExemption: exemptions.spouseExemption,
+    charityExemption: exemptions.charityExemption,
+    otherExemptions: exemptions.otherExemptions,
+    totalExemptions: exemptions.totalExemptions,
+    spouseExemptionCapped: exemptions.spouseExemptionCapped,
+  };
 
   return {
     success: true,
@@ -196,7 +152,8 @@ export function calculateIHT(estate: Estate, taxYear?: string): CalculationOutco
       grossEstate,
       netEstate,
       reliefBreakdown,
-      spouseExemption,
+      exemptionBreakdown,
+      nrbAfterSpouseCap,
       basicNrb,
       appliedRnrb,
       chargeableEstate,
@@ -206,7 +163,7 @@ export function calculateIHT(estate: Estate, taxYear?: string): CalculationOutco
       estateTax,
     ),
     giftAnalysis: createEmptyGiftAnalysis(),
-    warnings: [],
+    warnings: exemptions.warnings,
     auditTrail: [],
   };
 }
