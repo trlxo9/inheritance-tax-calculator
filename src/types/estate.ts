@@ -10,6 +10,7 @@ export interface Estate {
   beneficiaries: Beneficiary[];
   residence?: ResidenceDetails | null;
   predecessorEstate?: PredecessorEstate | null;
+  quickSuccessionRelief?: QuickSuccessionReliefClaim | null;
 }
 
 export interface DeceasedPerson {
@@ -49,6 +50,15 @@ export interface PredecessorEstate {
   unusedNrbPercentage: Decimal;
   unusedRnrbPercentage: Decimal;
   rnrbAvailableAtDeath: Decimal;
+}
+
+export interface QuickSuccessionReliefClaim {
+  previousDeath: Date;
+  taxPaidOnInheritance: Decimal;
+  inheritedPropertyValue?: Decimal;
+  yearsBeforeDeath?: number;
+  reliefPercentage?: Decimal;
+  qsrAmount?: Decimal;
 }
 
 export interface Liability {

@@ -37,6 +37,7 @@ export interface CalculationBreakdown {
   exemptionApplication: ExemptionBreakdown;
   thresholdCalculation: ThresholdBreakdown;
   taxCalculation: TaxBreakdown;
+  quickSuccessionRelief: QuickSuccessionReliefBreakdown;
 }
 
 export interface EstateValuationBreakdown {
@@ -99,6 +100,24 @@ export interface TaxBreakdown {
   grossTax: Decimal;
   quickSuccessionRelief: Decimal;
   netTax: Decimal;
+}
+
+export interface QuickSuccessionReliefBreakdown {
+  applies: boolean;
+  yearsSincePreviousDeath: number;
+  reliefPercentage: Decimal;
+  reliefAvailable: Decimal;
+  reliefApplied: Decimal;
+  freeEstateValue: Decimal;
+  trustValue: Decimal;
+  freeEstateThresholdAllocation: Decimal;
+  trustThresholdAllocation: Decimal;
+  freeEstateTaxBeforeQsr: Decimal;
+  trustTaxBeforeQsr: Decimal;
+  freeEstateQsr: Decimal;
+  trustQsr: Decimal;
+  freeEstateFinalTax: Decimal;
+  trustFinalTax: Decimal;
 }
 
 export interface GiftAnalysis {

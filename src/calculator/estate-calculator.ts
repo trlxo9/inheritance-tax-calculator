@@ -5,13 +5,21 @@ import { calculateExemptions } from '../rules/exemption-rules';
 import { applyReliefs } from '../rules/relief-rules';
 import { calculateGrossEstate } from './gross-estate';
 import { deductLiabilities } from './liabilities';
+import { calculateQuickSuccessionRelief, toQuickSuccessionBreakdown } from './qsr-calculator';
 import { calculateThresholds, type ThresholdResult } from './threshold-calculator';
 
 function decimalZero(): Decimal {
   return new Decimal(0);
 }
 
+function sumTrustInterests(estate: Estate): Decimal {
+  return estate.assets
+    .filter((asset) => asset.type === 'trust_interest')
+    .reduce((sum, asset) => sum.add(asset.grossValue.mul(asset.ownershipShare).div(100)), decimalZero());
+}
+
 function createEmptyBreakdown(
+  trustInterestsTotal: Decimal,
   grossEstate: Decimal,
   netEstate: Decimal,
   reliefBreakdown: CalculationBreakdown['reliefApplication'],
@@ -21,7 +29,9 @@ function createEmptyBreakdown(
   availableThreshold: Decimal,
   taxableAmount: Decimal,
   taxRate: Decimal,
-  estateTax: Decimal,
+  estateTaxBeforeQsr: Decimal,
+  estateTaxAfterQsr: Decimal,
+  qsrBreakdown: CalculationBreakdown['quickSuccessionRelief'],
 ): CalculationBreakdown {
   return {
     estateValuation: {
@@ -30,7 +40,7 @@ function createEmptyBreakdown(
       businessTotal: decimalZero(),
       agriculturalTotal: decimalZero(),
       personalTotal: decimalZero(),
-      trustInterestsTotal: decimalZero(),
+      trustInterestsTotal,
       giftsWithReservation: decimalZero(),
       grossTotal: grossEstate,
       liabilities: grossEstate.sub(netEstate),
@@ -56,10 +66,11 @@ function createEmptyBreakdown(
       taxableAmount,
       taxRate,
       charityRateApplies: taxRate.eq(36),
-      grossTax: estateTax,
-      quickSuccessionRelief: decimalZero(),
-      netTax: estateTax,
+      grossTax: estateTaxBeforeQsr,
+      quickSuccessionRelief: qsrBreakdown.reliefApplied,
+      netTax: estateTaxAfterQsr,
     },
+    quickSuccessionRelief: qsrBreakdown,
   };
 }
 
@@ -104,7 +115,19 @@ export function calculateIHT(estate: Estate, taxYear?: string): CalculationOutco
 
   const availableThreshold = thresholds.availableThreshold;
   const taxableAmount = thresholds.estateTaxableAmount;
-  const estateTax = thresholds.estateTax;
+  const estateTaxBeforeQsr = thresholds.estateTax;
+  const trustInterestsTotal = sumTrustInterests(estate);
+  const qsr = calculateQuickSuccessionRelief({
+    dateOfDeath: estate.deceased.dateOfDeath,
+    claim: estate.quickSuccessionRelief,
+    chargeableEstate,
+    availableThreshold,
+    taxRate,
+    estateTaxBeforeQsr,
+    trustInterestsValue: trustInterestsTotal,
+  });
+  const estateTax = qsr.estateTaxAfterQsr;
+  const totalTaxPayable = estateTax.add(thresholds.giftTax);
 
   const exemptionBreakdown: CalculationBreakdown['exemptionApplication'] = {
     spouseExemption: exemptions.spouseExemption,
@@ -128,10 +151,11 @@ export function calculateIHT(estate: Estate, taxYear?: string): CalculationOutco
       taxRate,
       estateTax,
       giftTax: thresholds.giftTax,
-      quickSuccessionRelief: decimalZero(),
-      totalTaxPayable: thresholds.totalTaxPayable,
+      quickSuccessionRelief: qsr.reliefApplied,
+      totalTaxPayable,
     },
     breakdown: createEmptyBreakdown(
+      trustInterestsTotal,
       grossEstate,
       netEstate,
       reliefBreakdown,
@@ -141,7 +165,9 @@ export function calculateIHT(estate: Estate, taxYear?: string): CalculationOutco
       availableThreshold,
       taxableAmount,
       taxRate,
+      estateTaxBeforeQsr,
       estateTax,
+      toQuickSuccessionBreakdown(qsr),
     ),
     giftAnalysis: createGiftAnalysis(thresholds),
     warnings: exemptions.warnings,

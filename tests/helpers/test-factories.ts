@@ -22,6 +22,7 @@ export function createTestEstate(overrides: Partial<Estate> = {}): Estate {
     beneficiaries: [],
     residence: null,
     predecessorEstate: null,
+    quickSuccessionRelief: null,
     ...overrides,
   };
 }

@@ -7,6 +7,7 @@ import type {
   LifetimeGift,
   Liability,
   PredecessorEstate,
+  QuickSuccessionReliefClaim,
   ResidenceDetails,
 } from '../../src/types';
 
@@ -42,6 +43,16 @@ interface RawFixtureInput {
     unusedRnrbPercentage: string;
     rnrbAvailableAtDeath: string;
   }) | null;
+  quickSuccessionRelief?: RawQuickSuccessionRelief | null;
+}
+
+interface RawQuickSuccessionRelief {
+  previousDeath: string;
+  taxPaidOnInheritance: string;
+  inheritedPropertyValue?: string;
+  yearsBeforeDeath?: number;
+  reliefPercentage?: string;
+  qsrAmount?: string;
 }
 
 type RawGift = {
@@ -75,7 +86,34 @@ interface Fixture {
 export async function loadFixture(relativePath: string): Promise<Fixture> {
   const fixturePath = join(process.cwd(), 'tests/fixtures/hmrc-examples', relativePath);
   const content = await readFile(fixturePath, 'utf-8');
-  return JSON.parse(content) as Fixture;
+  try {
+    return JSON.parse(content) as Fixture;
+  } catch {
+    // Some upstream fixture files contain a malformed "calculationNotes" terminator ("}" instead of "]").
+    const repaired = content.replace(/\n\s*},\n\s*"hmrcQuote":/m, '\n  ],\n  "hmrcQuote":');
+    return JSON.parse(repaired) as Fixture;
+  }
+}
+
+function convertQuickSuccessionRelief(
+  value: RawQuickSuccessionRelief | null | undefined,
+): QuickSuccessionReliefClaim | null {
+  if (!value) {
+    return null;
+  }
+
+  return {
+    previousDeath: new Date(value.previousDeath),
+    taxPaidOnInheritance: new Decimal(value.taxPaidOnInheritance),
+    inheritedPropertyValue:
+      value.inheritedPropertyValue === undefined
+        ? undefined
+        : new Decimal(value.inheritedPropertyValue),
+    yearsBeforeDeath: value.yearsBeforeDeath,
+    reliefPercentage:
+      value.reliefPercentage === undefined ? undefined : new Decimal(value.reliefPercentage),
+    qsrAmount: value.qsrAmount === undefined ? undefined : new Decimal(value.qsrAmount),
+  };
 }
 
 export function convertFixtureToInput(fixtureInput: RawFixtureInput): Estate {
@@ -184,5 +222,6 @@ export function convertFixtureToInput(fixtureInput: RawFixtureInput): Estate {
           rnrbAvailableAtDeath: new Decimal(fixtureInput.predecessorEstate.rnrbAvailableAtDeath),
         }
       : null,
+    quickSuccessionRelief: convertQuickSuccessionRelief(fixtureInput.quickSuccessionRelief),
   };
 }
