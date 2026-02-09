@@ -1,0 +1,138 @@
+{
+  "source": {
+    "type": "gov_uk",
+    "reference": "RNRB Guidance Example 4",
+    "title": "Large gifts fully exhausting basic NRB",
+    "url": "https://www.gov.uk/guidance/inheritance-tax-residence-nil-rate-band",
+    "dateAccessed": "2026-02-08"
+  },
+  "testCase": {
+    "id": "HMRC-034",
+    "milestone": "M4",
+    "priority": "P0",
+    "description": "Lifetime gifts exceed and fully exhaust NRB, creating tax on both gifts and estate",
+    "scenario": "Person dies in 2020-2021 with house £500,000, other assets £250,000. Made gifts of £700,000 within 7 years. Gifts fully consume NRB and create gift tax. Estate has no basic NRB available, only RNRB."
+  },
+  "input": {
+    "deceased": {
+      "dateOfDeath": "2020-11-10",
+      "domicileStatus": {
+        "type": "uk_domiciled"
+      },
+      "maritalStatus": {
+        "type": "single"
+      },
+      "hasDirectDescendants": true
+    },
+    "assets": [
+      {
+        "id": "asset-1",
+        "type": "property",
+        "description": "Main residence",
+        "grossValue": "500000",
+        "valuationDate": "2020-11-10",
+        "ownershipShare": "100",
+        "propertyType": "main_residence",
+        "isMainResidence": true
+      },
+      {
+        "id": "asset-2",
+        "type": "financial",
+        "description": "Other assets",
+        "grossValue": "250000",
+        "valuationDate": "2020-11-10",
+        "ownershipShare": "100",
+        "financialType": "investment",
+        "isInTrust": false
+      }
+    ],
+    "liabilities": [],
+    "gifts": [
+      {
+        "id": "gift-1",
+        "giftType": "pet",
+        "dateOfGift": "2018-03-15",
+        "value": "700000",
+        "recipient": {
+          "type": "individual",
+          "name": "Child",
+          "relationship": "child"
+        },
+        "description": "Large cash gift",
+        "isGiftWithReservation": false,
+        "petStatus": "failed"
+      }
+    ],
+    "beneficiaries": [
+      {
+        "id": "ben-1",
+        "name": "Children",
+        "relationship": "child",
+        "inheritanceType": "taxable",
+        "specificBequests": [],
+        "residuaryShare": "100"
+      }
+    ],
+    "residence": {
+      "value": "500000",
+      "passingToDirectDescendants": true,
+      "descendantShare": "100"
+    },
+    "predecessorEstate": null
+  },
+  "expectedOutput": {
+    "grossEstate": "750000",
+    "netEstate": "750000",
+    "totalReliefs": "0",
+    "totalExemptions": "0",
+    "chargeableEstate": "750000",
+    "basicNrb": "325000",
+    "nrbUsedByGifts": "325000",
+    "nrbRemainingForEstate": "0",
+    "maxRnrb": "175000",
+    "appliedRnrb": "175000",
+    "availableThresholdForEstate": "175000",
+    "giftTaxableAmount": "375000",
+    "giftTax": "150000",
+    "estateTaxableAmount": "575000",
+    "estateTax": "230000",
+    "totalTaxPayable": "380000"
+  },
+  "calculationNotes": [
+    "Tax year 2020-2021 with NRB £325,000 and max RNRB £175,000",
+    "Estate: £500,000 (house) + £250,000 (other) = £750,000",
+    "Lifetime gift: £700,000 within 7 years (2018 to 2020 = 2.7 years)",
+    "",
+    "Step 1: Process lifetime gift",
+    "Gift value: £700,000",
+    "Basic NRB available: £325,000",
+    "Gift exceeds NRB by: £700,000 - £325,000 = £375,000",
+    "Years before death: 2.7 (in 0-3 year band, no taper relief)",
+    "Tax on gift: £375,000 × 40% = £150,000",
+    "NRB fully consumed by gift",
+    "",
+    "Step 2: Calculate remaining NRB for estate",
+    "Basic NRB: £325,000",
+    "Used by gifts: £325,000",
+    "Remaining for estate: £0",
+    "",
+    "Step 3: Calculate RNRB",
+    "Property to descendants: £500,000",
+    "Max RNRB: £175,000",
+    "Applied RNRB: min(£175,000, £500,000) = £175,000",
+    "",
+    "Step 4: Calculate estate threshold",
+    "NRB remaining: £0",
+    "RNRB: £175,000",
+    "Total threshold: £0 + £175,000 = £175,000",
+    "",
+    "Step 5: Calculate estate tax",
+    "Estate value: £750,000",
+    "Threshold: £175,000",
+    "Taxable: £750,000 - £175,000 = £575,000",
+    "Tax at 40%: £575,000 × 40% = £230,000",
+    "",
+    "Total IHT: £150,000 (gift) + £230,000 (estate) = £380,000"
+  ],
+  "hmrcQuote": "The gifts use up all of the basic nil rate band. The estate has no basic nil rate band remaining, but the £175,000 RNRB still applies to the residence passing to direct descendants."
+}

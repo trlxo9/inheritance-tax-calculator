@@ -1,0 +1,103 @@
+{
+  "source": {
+    "type": "hmrc_manual",
+    "reference": "IHTM14611",
+    "title": "PET within 7 years but below NRB - no taper applies",
+    "url": "https://www.gov.uk/hmrc-internal-manuals/inheritance-tax-manual/ihtm14611",
+    "dateAccessed": "2026-02-08"
+  },
+  "testCase": {
+    "id": "HMRC-041",
+    "milestone": "M5",
+    "priority": "P0",
+    "description": "Gift within 7 years but below NRB - no tax, taper relief does not apply",
+    "scenario": "Albert makes a gift of £300,000 on 1 February 2009 and dies on 20 June 2012. The gift is within 7 years but its value is below the NRB at death. No tax is due, so taper relief does not apply."
+  },
+  "input": {
+    "deceased": {
+      "dateOfDeath": "2012-06-20",
+      "domicileStatus": {
+        "type": "uk_domiciled"
+      },
+      "maritalStatus": {
+        "type": "single"
+      },
+      "hasDirectDescendants": false
+    },
+    "assets": [],
+    "liabilities": [],
+    "gifts": [
+      {
+        "id": "gift-1",
+        "giftType": "pet",
+        "dateOfGift": "2009-02-01",
+        "value": "300000",
+        "recipient": {
+          "type": "individual",
+          "name": "Dinesh",
+          "relationship": "child"
+        },
+        "description": "Cash gift to child",
+        "isGiftWithReservation": false,
+        "petStatus": "failed"
+      }
+    ],
+    "beneficiaries": [],
+    "residence": null,
+    "predecessorEstate": null
+  },
+  "expectedOutput": {
+    "grossEstate": "0",
+    "netEstate": "0",
+    "totalReliefs": "0",
+    "totalExemptions": "0",
+    "chargeableEstate": "0",
+    "basicNrb": "325000",
+    "availableThreshold": "325000",
+    "giftAnalysis": {
+      "giftId": "gift-1",
+      "giftValue": "300000",
+      "dateOfGift": "2009-02-01",
+      "dateOfDeath": "2012-06-20",
+      "yearsBeforeDeath": 3.38,
+      "withinSevenYears": true,
+      "annualExemptionApplied": "0",
+      "chargeableValue": "300000",
+      "nrbAvailable": "325000",
+      "amountOverNrb": "0",
+      "taxAtFullRate": "0",
+      "taperApplies": false,
+      "taperPercentage": "0",
+      "taxAfterTaper": "0",
+      "taperReliefGiven": "0",
+      "paidBy": "n/a"
+    },
+    "estateTax": "0",
+    "giftTax": "0",
+    "totalTaxPayable": "0",
+    "nrbRemainingForEstate": "25000"
+  },
+  "calculationNotes": [
+    "Gift made: 1 February 2009",
+    "Death: 20 June 2012",
+    "Time between: approximately 3 years 4 months",
+    "Gift is within 7 years, so PET fails and becomes chargeable",
+    "",
+    "Gift value: £300,000",
+    "NRB at death: £325,000",
+    "Gift value < NRB: £300,000 < £325,000",
+    "",
+    "Since gift does not exceed NRB, there is no tax directly attributable to the gift",
+    "Therefore, taper relief does not apply (nothing to taper)",
+    "",
+    "Key principle: Taper relief only applies if there is tax to reduce",
+    "Taper relief reduces TAX, not the gift value for cumulation",
+    "",
+    "NRB used by gift: £300,000",
+    "NRB remaining for estate: £325,000 - £300,000 = £25,000",
+    "",
+    "No estate assets in this example",
+    "Total IHT: £0"
+  ],
+  "hmrcQuote": "Albert makes a gift of £300,000 on 1 February 2009 and dies on 20 June 2012. The gift is over three years from the date of death, but its value is below the IHT nil-rate band at the date of death. There is no tax directly attributable to the gift and so no taper relief applies."
+}

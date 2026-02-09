@@ -1,0 +1,77 @@
+{
+  "source": {
+    "type": "hmrc_manual",
+    "reference": "IHTM42087",
+    "title": "Ten year anniversary charge (post-November 2015 rules) - Joseph's trust",
+    "url": "https://www.gov.uk/hmrc-internal-manuals/inheritance-tax-manual/ihtm42087",
+    "dateAccessed": "2026-02-08"
+  },
+  "testCase": {
+    "id": "HMRC-072",
+    "milestone": "M7",
+    "priority": "P0",
+    "description": "10-year charge using post-Nov 2015 rules (excludes non-relevant property)",
+    "scenario": "Joseph's trust D reaches 10-year anniversary on or after 18 November 2015. Under new rules, non-relevant property is excluded from notional transfer calculation. Trust has £350,000 relevant property."
+  },
+  "trustDetails": {
+    "trustType": "discretionary",
+    "settlementDate": "2005-12-01",
+    "anniversaryDate": "2015-12-01",
+    "trustValue": "350000",
+    "settlor": {
+      "name": "Joseph",
+      "lifetimeTransfersInSevenYears": "150000"
+    }
+  },
+  "input": {
+    "notionalLifetimeTransfer": "500000",
+    "availableNilRateBand": "274980",
+    "relevantPropertyValue": "350000",
+    "relatedSettlements": "150000",
+    "nonRelevantProperty": "0"
+  },
+  "expectedOutput": {
+    "notionalTransfer": "500000",
+    "availableNrb": "274980",
+    "excessOverNrb": "225020",
+    "hypotheticalTaxAt20Percent": "45004",
+    "effectiveRate": "9.000800",
+    "anniversaryRate": "2.700240",
+    "taxOnRelevantProperty": "9450",
+    "maxRateCap": "6",
+    "cappedTax": "9450"
+  },
+  "calculationNotes": [
+    "POST-NOVEMBER 2015 RULES",
+    "For anniversaries on or after 18 November 2015, non-relevant property is excluded",
+    "",
+    "Step 1: Determine notional lifetime transfer",
+    "Relevant property in this trust: £350,000",
+    "Related settlements (same day): £150,000",
+    "Non-relevant property: EXCLUDED under new rules",
+    "Notional transfer = £350,000 + £150,000 = £500,000",
+    "",
+    "Step 2: Apply NRB",
+    "NRB at anniversary: £325,000",
+    "Less settlor's lifetime transfers: £50,020",
+    "Available NRB: £274,980",
+    "Excess over NRB: £500,000 - £274,980 = £225,020",
+    "",
+    "Step 3: Calculate hypothetical rate",
+    "Tax on excess at 20%: £225,020 × 20% = £45,004",
+    "Effective rate: (£45,004 / £500,000) × 100 = 9.001%",
+    "",
+    "Step 4: Apply 3/10 multiplier",
+    "Anniversary rate: 9.001% × 3/10 = 2.700%",
+    "",
+    "Step 5: Calculate tax",
+    "Tax on trust value: £350,000 × 2.700% = £9,450",
+    "",
+    "Step 6: Check 6% cap",
+    "Maximum charge: £350,000 × 6% = £21,000",
+    "Actual charge £9,450 < £21,000, so no capping required",
+    "",
+    "Key difference from pre-2015: Non-relevant property excluded reduces notional transfer"
+  ],
+  "hmrcQuote": "Joseph's trust D calculation (on or after November 18, 2015) excluded non-relevant property. The notional transfer was £500,000 with £274,980 nil rate band available. Effective rate: 9.000%, anniversary rate: 2.700%. Tax on £350,000: £9,450."
+}

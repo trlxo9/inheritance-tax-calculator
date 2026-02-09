@@ -1,0 +1,17 @@
+[
+  {
+  "Plan Type":"Designated UT",
+  "Account Tab":"Financials",
+  "Salesforce Section Used to Identify":"Investment Accounts",
+  "Field used to Identify":"Product and Designation",
+  "Values Required":"Unit Trust and name",
+  "Other Filters":"For 7 years"
+},
+{
+  "Plan Type":"",
+  "Account Tab":"Advice Set",
+  "Salesforce Section Used to Identify":"Gifts made in last 14 years",
+  "Field used to Identify":"Type of Gift",
+  "Values Required":"PET,"
+  }
+  ]

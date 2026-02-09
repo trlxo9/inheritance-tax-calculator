@@ -1,0 +1,152 @@
+{
+  "source": {
+    "type": "synthetic",
+    "reference": "SYN-CLT-003",
+    "title": "14-year lookback - CLT followed by PET",
+    "url": "N/A - Synthetic test case",
+    "dateAccessed": "2026-02-08",
+    "rationale": "No official HMRC example showing 14-year cumulation where CLT affects PET's available NRB. This is one of the most complex areas of IHT and critical for accurate gift tax calculation."
+  },
+  "testCase": {
+    "id": "SYN-CLT-003",
+    "milestone": "M6",
+    "priority": "P0",
+    "description": "CLT made 10 years before death, PET made 4 years before death - 14-year cumulation applies",
+    "scenario": "Donor makes CLT of £200,000 in 2013, then PET of £400,000 in 2019, and dies in 2023. The CLT is outside the 7-year window for death (so no additional CLT tax), but it's within 7 years of the PET, so it reduces the NRB available for the PET calculation."
+  },
+  "input": {
+    "deceased": {
+      "dateOfDeath": "2023-06-01",
+      "domicileStatus": {
+        "type": "uk_domiciled"
+      },
+      "maritalStatus": {
+        "type": "single"
+      },
+      "hasDirectDescendants": false
+    },
+    "assets": [],
+    "liabilities": [],
+    "gifts": [
+      {
+        "id": "gift-1",
+        "giftType": "clt",
+        "dateOfGift": "2013-03-15",
+        "value": "200000",
+        "recipient": {
+          "type": "trust",
+          "name": "Discretionary Trust",
+          "relationship": "n/a"
+        },
+        "description": "CLT into trust",
+        "isGiftWithReservation": false,
+        "trustDetails": {
+          "trustType": "discretionary",
+          "trustId": "trust-1"
+        },
+        "taxPaidAtTransfer": "0",
+        "paidByDonor": false
+      },
+      {
+        "id": "gift-2",
+        "giftType": "pet",
+        "dateOfGift": "2019-09-10",
+        "value": "400000",
+        "recipient": {
+          "type": "individual",
+          "name": "Daughter",
+          "relationship": "child"
+        },
+        "description": "Cash gift to daughter",
+        "isGiftWithReservation": false,
+        "petStatus": "failed"
+      }
+    ],
+    "beneficiaries": [],
+    "residence": null,
+    "predecessorEstate": null
+  },
+  "expectedOutput": {
+    "cltAnalysis": {
+      "giftDate": "2013-03-15",
+      "deathDate": "2023-06-01",
+      "yearsBeforeDeath": 10.21,
+      "withinSevenYears": false,
+      "noAdditionalTaxDue": true,
+      "lifetimeTaxPaid": "0"
+    },
+    "petAnalysis": {
+      "giftDate": "2019-09-10",
+      "deathDate": "2023-06-01",
+      "yearsBeforeDeath": 3.73,
+      "withinSevenYears": true,
+      "petFails": true,
+      "cltWithinSevenYearsOfPet": true,
+      "cltDate": "2013-03-15",
+      "petDate": "2019-09-10",
+      "yearsBetweenCltAndPet": 6.49,
+      "fourteenYearRuleApplies": true,
+      "nrbAtDeath": "325000",
+      "nrbUsedByClt": "200000",
+      "nrbAvailableForPet": "125000",
+      "petValue": "400000",
+      "petExcessOverAvailableNrb": "275000",
+      "taperBand": "3-4 years",
+      "taperPercentage": "20",
+      "effectiveTaxRate": "32",
+      "taxOnPet": "88000"
+    },
+    "totalTaxPayable": "88000"
+  },
+  "calculationNotes": [
+    "14-YEAR LOOKBACK RULE",
+    "",
+    "Timeline:",
+    "2013-03-15: CLT of £200,000",
+    "2019-09-10: PET of £400,000 (6.49 years after CLT)",
+    "2023-06-01: Death (10.21 years after CLT, 3.73 years after PET)",
+    "",
+    "KEY PRINCIPLE: 14-Year Cumulation",
+    "For PETs, look back 7 years from the PET date for prior CLTs",
+    "This creates an effective 14-year window for CLT-PET interactions",
+    "",
+    "Step 1: Analyze CLT (2013)",
+    "CLT date: 2013-03-15",
+    "Death: 2023-06-01",
+    "Years: 10.21 years",
+    "Within 7 years of death? NO",
+    "Result: No additional CLT tax due at death",
+    "",
+    "Step 2: Check if CLT affects PET",
+    "CLT date: 2013-03-15",
+    "PET date: 2019-09-10",
+    "Years between: 6.49 years",
+    "Within 7 years of PET? YES (6.49 < 7)",
+    "Result: CLT cumulates with PET, reducing NRB available",
+    "",
+    "Step 3: Calculate PET tax",
+    "PET value: £400,000",
+    "NRB at death: £325,000",
+    "Less NRB used by CLT: £200,000",
+    "NRB available for PET: £325,000 - £200,000 = £125,000",
+    "",
+    "PET excess over available NRB:",
+    "£400,000 - £125,000 = £275,000",
+    "",
+    "Step 4: Apply taper to PET",
+    "PET to death: 3.73 years (3-4 year band)",
+    "Taper relief: 20% (tax at 80% of full rate)",
+    "Effective rate: 40% × 80% = 32%",
+    "",
+    "Tax on PET: £275,000 × 32% = £88,000",
+    "",
+    "IMPORTANT: If the CLT had been made > 7 years before the PET:",
+    "- Full £325,000 NRB would be available for PET",
+    "- PET excess would be only £75,000",
+    "- Tax would be only £24,000",
+    "- So the CLT timing cost £64,000 in extra tax!",
+    "",
+    "This demonstrates why the 14-year rule is critical for planning"
+  ],
+  "hmrcQuote": "N/A - Synthetic case. Based on IHTA 1984 s.7 which requires cumulation of chargeable transfers in the 7 years before each transfer. For a PET failing on death, CLTs made up to 7 years before the PET must be considered, creating an effective 14-year window."
+}

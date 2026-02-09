@@ -1,0 +1,138 @@
+{
+  "source": {
+    "type": "hmrc_manual",
+    "reference": "IHTM22045",
+    "title": "Quick Succession Relief - Charles inherited house example",
+    "url": "https://www.gov.uk/hmrc-internal-manuals/inheritance-tax-manual/ihtm22045",
+    "dateAccessed": "2026-02-08"
+  },
+  "testCase": {
+    "id": "HMRC-080",
+    "milestone": "M8",
+    "priority": "P0",
+    "description": "QSR applies even when inherited property is exempt on second death",
+    "scenario": "Charles inherited a house in 2008 (IHT was paid). He lived there and died in 2010 leaving the house to his civil partner (exempt). However, he also had a life tenancy in a family settlement worth £400,000 which is taxable. QSR applies to the settled property."
+  },
+  "input": {
+    "deceased": {
+      "dateOfDeath": "2010-06-15",
+      "domicileStatus": {
+        "type": "uk_domiciled"
+      },
+      "maritalStatus": {
+        "type": "civil_partnership",
+        "partnerDomicile": "uk"
+      },
+      "hasDirectDescendants": false
+    },
+    "assets": [
+      {
+        "id": "asset-1",
+        "type": "property",
+        "description": "Inherited house (now passing to civil partner)",
+        "grossValue": "250000",
+        "valuationDate": "2010-06-15",
+        "ownershipShare": "100",
+        "propertyType": "main_residence",
+        "isMainResidence": true
+      },
+      {
+        "id": "asset-2",
+        "type": "trust_interest",
+        "description": "Life tenancy in family settlement",
+        "grossValue": "400000",
+        "valuationDate": "2010-06-15",
+        "ownershipShare": "100",
+        "trustType": "life_interest",
+        "trustId": "family-settlement-1"
+      }
+    ],
+    "liabilities": [],
+    "gifts": [],
+    "beneficiaries": [
+      {
+        "id": "ben-1",
+        "name": "Civil Partner",
+        "relationship": "civil_partner",
+        "inheritanceType": "exempt_spouse",
+        "specificBequests": [
+          {
+            "assetId": "asset-1",
+            "isTaxFree": false
+          }
+        ],
+        "residuaryShare": "0"
+      },
+      {
+        "id": "ben-2",
+        "name": "Trust Beneficiaries",
+        "relationship": "other",
+        "inheritanceType": "taxable",
+        "specificBequests": [
+          {
+            "assetId": "asset-2",
+            "isTaxFree": false
+          }
+        ],
+        "residuaryShare": "0"
+      }
+    ],
+    "quickSuccessionRelief": {
+      "previousDeath": "2008-03-01",
+      "taxPaidOnInheritance": "40000",
+      "inheritedPropertyValue": "250000",
+      "yearsBeforeDeath": 2.29,
+      "reliefPercentage": "80",
+      "qsrAmount": "32000"
+    },
+    "residence": null,
+    "predecessorEstate": null
+  },
+  "expectedOutput": {
+    "grossEstate": "650000",
+    "netEstate": "650000",
+    "houseExemption": "250000",
+    "totalExemptions": "250000",
+    "chargeableEstate": "400000",
+    "basicNrb": "325000",
+    "availableThreshold": "325000",
+    "taxableAmount": "75000",
+    "taxBeforeQsr": "30000",
+    "qsrAmount": "24000",
+    "estateTax": "6000",
+    "totalTaxPayable": "6000"
+  },
+  "calculationNotes": [
+    "Charles inherited house in 2008 when IHT was paid on parent's estate",
+    "Charles dies in 2010 (approximately 2.3 years later)",
+    "",
+    "Estate composition:",
+    "- House: £250,000 (to civil partner - EXEMPT)",
+    "- Life interest in settlement: £400,000 (TAXABLE)",
+    "",
+    "Key principle: QSR applies even though inherited property (house) is exempt",
+    "Reason: Tax is payable on OTHER property (the settled property)",
+    "",
+    "Step 1: Calculate tax on death estate",
+    "Gross estate: £650,000",
+    "Less spouse exemption (house): £250,000",
+    "Chargeable estate: £400,000",
+    "Less NRB: £325,000",
+    "Taxable: £75,000",
+    "Tax at 40%: £30,000",
+    "",
+    "Step 2: Calculate QSR",
+    "Time since inheritance: ~2.3 years (1-2 year band)",
+    "Relief percentage: 80%",
+    "Tax paid on inherited property: £40,000 (estimate)",
+    "Calculation: min(£40,000 × 80%, current tax £30,000) = £24,000",
+    "",
+    "Step 3: Apply QSR",
+    "Tax before QSR: £30,000",
+    "Less QSR: £24,000",
+    "Final tax: £6,000",
+    "",
+    "Note: The fact that inherited property is exempt on Charles's death does not prevent QSR"
+  ],
+  "hmrcQuote": "Charles inherited a house in 2008 with IHT paid, lived there and died in 2010, leaving his estate to his civil partner while also being a life tenant of a trust fund worth £400,000. The fact that the property which he received on the earlier transfer is exempt on his death does not matter - QSR still applies because tax is payable on part of the death estate (settled property)."
+}

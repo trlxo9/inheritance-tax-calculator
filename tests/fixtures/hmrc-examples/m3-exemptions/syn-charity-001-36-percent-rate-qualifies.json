@@ -1,0 +1,133 @@
+{
+  "source": {
+    "type": "synthetic",
+    "reference": "SYN-CHARITY-001",
+    "title": "Charity bequest qualifying for 36% reduced rate",
+    "url": "N/A - Synthetic test case",
+    "dateAccessed": "2026-02-08",
+    "rationale": "No official HMRC worked example found showing the 36% charity rate calculation. This is critical for M3 milestone as the reduced rate is a common planning tool."
+  },
+  "testCase": {
+    "id": "SYN-CHARITY-001",
+    "milestone": "M3",
+    "priority": "P0",
+    "description": "Estate qualifying for 36% reduced rate due to 10%+ charitable bequest",
+    "scenario": "Estate of £1,000,000 with £200,000 to spouse (exempt), £100,000 to charity, and £700,000 residue to children. Charity bequest is exactly 10% of baseline, qualifying for 36% rate instead of 40%."
+  },
+  "input": {
+    "deceased": {
+      "dateOfDeath": "2021-06-15",
+      "domicileStatus": {
+        "type": "uk_domiciled"
+      },
+      "maritalStatus": {
+        "type": "married",
+        "spouseDomicile": "uk"
+      },
+      "hasDirectDescendants": true
+    },
+    "assets": [
+      {
+        "id": "asset-1",
+        "type": "financial",
+        "description": "Total estate assets",
+        "grossValue": "1000000",
+        "valuationDate": "2021-06-15",
+        "ownershipShare": "100",
+        "financialType": "investment",
+        "isInTrust": false
+      }
+    ],
+    "liabilities": [],
+    "gifts": [],
+    "beneficiaries": [
+      {
+        "id": "ben-1",
+        "name": "Spouse",
+        "relationship": "spouse",
+        "inheritanceType": "exempt_spouse",
+        "specificBequests": [
+          {
+            "cashAmount": "200000",
+            "isTaxFree": false
+          }
+        ],
+        "residuaryShare": "0"
+      },
+      {
+        "id": "ben-2",
+        "name": "Cancer Research UK",
+        "relationship": "charity",
+        "inheritanceType": "exempt_charity",
+        "specificBequests": [
+          {
+            "cashAmount": "100000",
+            "isTaxFree": false
+          }
+        ],
+        "residuaryShare": "0"
+      },
+      {
+        "id": "ben-3",
+        "name": "Children",
+        "relationship": "child",
+        "inheritanceType": "taxable",
+        "specificBequests": [],
+        "residuaryShare": "100"
+      }
+    ],
+    "residence": null,
+    "predecessorEstate": null
+  },
+  "expectedOutput": {
+    "grossEstate": "1000000",
+    "netEstate": "1000000",
+    "spouseExemption": "200000",
+    "charityExemption": "100000",
+    "totalExemptions": "300000",
+    "baseline": "800000",
+    "charityThreshold10Percent": "80000",
+    "charityBequest": "100000",
+    "charityRateQualifies": true,
+    "taxRate": "36",
+    "chargeableEstate": "700000",
+    "basicNrb": "325000",
+    "availableThreshold": "325000",
+    "taxableAmount": "375000",
+    "totalTaxPayable": "135000"
+  },
+  "calculationNotes": [
+    "CHARITY REDUCED RATE CALCULATION",
+    "",
+    "Step 1: Calculate baseline (before charity deduction)",
+    "Gross estate: £1,000,000",
+    "Less spouse exemption: £200,000",
+    "Less reliefs: £0",
+    "Baseline = £1,000,000 - £200,000 = £800,000",
+    "",
+    "Step 2: Calculate 10% threshold",
+    "10% of baseline: £800,000 × 10% = £80,000",
+    "",
+    "Step 3: Compare charity bequest to threshold",
+    "Charity bequest: £100,000",
+    "Required for 36% rate: £80,000",
+    "£100,000 ≥ £80,000 ✓ QUALIFIES",
+    "",
+    "Step 4: Apply reduced rate",
+    "Tax rate: 36% (instead of 40%)",
+    "",
+    "Step 5: Calculate tax",
+    "Chargeable estate after all exemptions:",
+    "£1,000,000 - £200,000 (spouse) - £100,000 (charity) = £700,000",
+    "Less NRB: £325,000",
+    "Taxable: £700,000 - £325,000 = £375,000",
+    "Tax at 36%: £375,000 × 36% = £135,000",
+    "",
+    "Comparison if 40% rate applied:",
+    "£375,000 × 40% = £150,000",
+    "Saving by using charity rate: £15,000",
+    "",
+    "Key formula: Charity ≥ (Estate - Spouse - Reliefs) × 10%"
+  ],
+  "hmrcQuote": "N/A - Synthetic case. Based on IHTA 1984 Schedule 1A which provides that where 10% or more of a deceased's net estate (after deducting spouse exemption and reliefs) is left to charity, the rate of tax on the remaining chargeable estate is reduced from 40% to 36%."
+}

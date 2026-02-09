@@ -1,0 +1,32 @@
+{
+  "name": "inheritance_tax_calculator",
+  "version": "1.0.0",
+  "description": "UK Inheritance Tax calculator in TypeScript",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "keywords": [
+    "inheritance-tax",
+    "iht",
+    "typescript"
+  ],
+  "author": "Codex",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "decimal.js": "^10.6.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.2",
+    "@vitest/coverage-v8": "^4.0.18",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  }
+}

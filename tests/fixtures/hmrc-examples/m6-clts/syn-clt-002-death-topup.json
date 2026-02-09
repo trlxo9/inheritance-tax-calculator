@@ -1,0 +1,144 @@
+{
+  "source": {
+    "type": "synthetic",
+    "reference": "SYN-CLT-002",
+    "title": "CLT death top-up with taper relief",
+    "url": "N/A - Synthetic test case",
+    "dateAccessed": "2026-02-08",
+    "rationale": "No official HMRC example showing CLT top-up calculation when donor dies within 7 years. Critical for understanding how lifetime tax is credited and taper relief applies."
+  },
+  "testCase": {
+    "id": "SYN-CLT-002",
+    "milestone": "M6",
+    "priority": "P0",
+    "description": "CLT made at lifetime with 20% tax paid; donor dies 4.5 years later requiring top-up to death rate with taper relief",
+    "scenario": "Settlor made CLT of £400,000 in June 2018, paying £18,750 tax at 20% lifetime rate (grossed up). Donor dies 4.5 years later in January 2023. Additional tax due at tapered death rate, with credit for tax already paid."
+  },
+  "input": {
+    "deceased": {
+      "dateOfDeath": "2023-01-15",
+      "domicileStatus": {
+        "type": "uk_domiciled"
+      },
+      "maritalStatus": {
+        "type": "single"
+      },
+      "hasDirectDescendants": false
+    },
+    "assets": [
+      {
+        "id": "asset-1",
+        "type": "financial",
+        "description": "Small residual estate",
+        "grossValue": "50000",
+        "valuationDate": "2023-01-15",
+        "ownershipShare": "100",
+        "financialType": "bank_account",
+        "isInTrust": false
+      }
+    ],
+    "liabilities": [],
+    "gifts": [
+      {
+        "id": "gift-1",
+        "giftType": "clt",
+        "dateOfGift": "2018-06-15",
+        "value": "418750",
+        "recipient": {
+          "type": "trust",
+          "name": "Family Discretionary Trust",
+          "relationship": "n/a"
+        },
+        "description": "Gift into discretionary trust (grossed up value)",
+        "isGiftWithReservation": false,
+        "trustDetails": {
+          "trustType": "discretionary",
+          "trustId": "family-trust-1"
+        },
+        "taxPaidAtTransfer": "18750",
+        "paidByDonor": true
+      }
+    ],
+    "beneficiaries": [
+      {
+        "id": "ben-1",
+        "name": "Residuary beneficiaries",
+        "relationship": "other",
+        "inheritanceType": "taxable",
+        "specificBequests": [],
+        "residuaryShare": "100"
+      }
+    ],
+    "residence": null,
+    "predecessorEstate": null
+  },
+  "expectedOutput": {
+    "grossEstate": "50000",
+    "netEstate": "50000",
+    "cltAnalysis": {
+      "grossedUpTransferValue": "418750",
+      "dateOfGift": "2018-06-15",
+      "dateOfDeath": "2023-01-15",
+      "yearsBeforeDeath": 4.58,
+      "taperBand": "4-5 years",
+      "taperPercentage": "40",
+      "effectiveTaxRate": "24",
+      "nrbAtDeath": "325000",
+      "excessOverNrb": "93750",
+      "taxAtDeathRate": "22500",
+      "taxPaidAtLifetime": "18750",
+      "additionalTaxDue": "3750",
+      "paidBy": "trustees"
+    },
+    "estateTax": "0",
+    "cltTopUpTax": "3750",
+    "totalTaxPayable": "3750"
+  },
+  "calculationNotes": [
+    "CLT DEATH TOP-UP CALCULATION",
+    "",
+    "LIFETIME CHARGE (2018)",
+    "Original gift: £400,000",
+    "Grossed up transfer: £418,750",
+    "Tax paid at 20%: £18,750",
+    "",
+    "DEATH OCCURRED (2023)",
+    "Gift date: 15 June 2018",
+    "Death date: 15 January 2023",
+    "Time elapsed: 4 years 7 months = 4.58 years",
+    "Within 7 years: YES - additional tax may be due",
+    "",
+    "Step 1: Determine taper band",
+    "Years: 4.58 falls in 4-5 year band",
+    "Taper relief: 40% (so tax at 60% of death rate)",
+    "Effective rate: 40% × 60% = 24%",
+    "",
+    "Step 2: Calculate tax at death rates",
+    "Grossed-up transfer: £418,750",
+    "NRB at death: £325,000",
+    "Excess: £418,750 - £325,000 = £93,750",
+    "Tax at tapered rate (24%): £93,750 × 24% = £22,500",
+    "",
+    "Step 3: Credit lifetime tax",
+    "Tax due at death rate: £22,500",
+    "Less tax already paid: £18,750",
+    "Additional tax due: £22,500 - £18,750 = £3,750",
+    "",
+    "Step 4: Who pays the top-up?",
+    "Payable by trustees (not donor's estate)",
+    "",
+    "ESTATE CALCULATION",
+    "Estate value: £50,000",
+    "NRB consumed by CLT: £418,750 (fully consumes £325,000)",
+    "NRB remaining for estate: £0",
+    "Estate below any available threshold: No tax on estate",
+    "",
+    "TOTAL IHT",
+    "Lifetime charge: £18,750 (paid 2018)",
+    "Top-up charge: £3,750 (paid 2023)",
+    "Total CLT tax: £22,500",
+    "Estate tax: £0",
+    "Grand total: £22,500"
+  ],
+  "hmrcQuote": "N/A - Synthetic case. Based on IHTA 1984 s.7 regarding additional tax on CLTs when transferor dies within 7 years, with taper relief per Schedule 2 and credit for tax paid at transfer per s.7(4)."
+}

@@ -1,0 +1,139 @@
+{
+  "source": {
+    "type": "synthetic",
+    "reference": "SYN-CHARITY-002",
+    "title": "Charity bequest just failing to qualify for 36% rate",
+    "url": "N/A - Synthetic test case",
+    "dateAccessed": "2026-02-08",
+    "rationale": "Boundary condition test for charity rate. Important to verify that falling just short of 10% threshold results in standard 40% rate."
+  },
+  "testCase": {
+    "id": "SYN-CHARITY-002",
+    "milestone": "M3",
+    "priority": "P0",
+    "description": "Estate failing to qualify for 36% rate - charity bequest just below 10% threshold",
+    "scenario": "Same estate as SYN-CHARITY-001 but charity bequest is £79,000 (below the £80,000 threshold). Standard 40% rate applies instead of reduced 36% rate."
+  },
+  "input": {
+    "deceased": {
+      "dateOfDeath": "2021-06-15",
+      "domicileStatus": {
+        "type": "uk_domiciled"
+      },
+      "maritalStatus": {
+        "type": "married",
+        "spouseDomicile": "uk"
+      },
+      "hasDirectDescendants": true
+    },
+    "assets": [
+      {
+        "id": "asset-1",
+        "type": "financial",
+        "description": "Total estate assets",
+        "grossValue": "1000000",
+        "valuationDate": "2021-06-15",
+        "ownershipShare": "100",
+        "financialType": "investment",
+        "isInTrust": false
+      }
+    ],
+    "liabilities": [],
+    "gifts": [],
+    "beneficiaries": [
+      {
+        "id": "ben-1",
+        "name": "Spouse",
+        "relationship": "spouse",
+        "inheritanceType": "exempt_spouse",
+        "specificBequests": [
+          {
+            "cashAmount": "200000",
+            "isTaxFree": false
+          }
+        ],
+        "residuaryShare": "0"
+      },
+      {
+        "id": "ben-2",
+        "name": "Cancer Research UK",
+        "relationship": "charity",
+        "inheritanceType": "exempt_charity",
+        "specificBequests": [
+          {
+            "cashAmount": "79000",
+            "isTaxFree": false
+          }
+        ],
+        "residuaryShare": "0"
+      },
+      {
+        "id": "ben-3",
+        "name": "Children",
+        "relationship": "child",
+        "inheritanceType": "taxable",
+        "specificBequests": [],
+        "residuaryShare": "100"
+      }
+    ],
+    "residence": null,
+    "predecessorEstate": null
+  },
+  "expectedOutput": {
+    "grossEstate": "1000000",
+    "netEstate": "1000000",
+    "spouseExemption": "200000",
+    "charityExemption": "79000",
+    "totalExemptions": "279000",
+    "baseline": "800000",
+    "charityThreshold10Percent": "80000",
+    "charityBequest": "79000",
+    "charityRateQualifies": false,
+    "taxRate": "40",
+    "chargeableEstate": "721000",
+    "basicNrb": "325000",
+    "availableThreshold": "325000",
+    "taxableAmount": "396000",
+    "totalTaxPayable": "158400"
+  },
+  "calculationNotes": [
+    "CHARITY REDUCED RATE - BOUNDARY FAILURE",
+    "",
+    "Step 1: Calculate baseline",
+    "Gross estate: £1,000,000",
+    "Less spouse exemption: £200,000",
+    "Baseline = £800,000",
+    "",
+    "Step 2: Calculate 10% threshold",
+    "10% of baseline: £800,000 × 10% = £80,000",
+    "",
+    "Step 3: Compare charity bequest to threshold",
+    "Charity bequest: £79,000",
+    "Required for 36% rate: £80,000",
+    "£79,000 < £80,000 ✗ DOES NOT QUALIFY",
+    "",
+    "Step 4: Apply standard rate",
+    "Tax rate: 40% (standard rate applies)",
+    "",
+    "Step 5: Calculate tax",
+    "Chargeable estate after exemptions:",
+    "£1,000,000 - £200,000 (spouse) - £79,000 (charity) = £721,000",
+    "Less NRB: £325,000",
+    "Taxable: £721,000 - £325,000 = £396,000",
+    "Tax at 40%: £396,000 × 40% = £158,400",
+    "",
+    "Comparison with SYN-CHARITY-001:",
+    "If charity had been £80,000 (qualifying):",
+    "- Chargeable: £720,000",
+    "- Taxable: £395,000",
+    "- Tax at 36%: £142,200",
+    "",
+    "By giving £79,000 instead of £80,000:",
+    "- Saved £1,000 to charity",
+    "- Cost £158,400 - £142,200 = £16,200 extra tax",
+    "- Net loss: £15,200",
+    "",
+    "Key lesson: Missing threshold by £1,000 costs £16,200 in extra tax!"
+  ],
+  "hmrcQuote": "N/A - Synthetic case. Demonstrates the cliff-edge effect of the 10% charity threshold. The reduced rate only applies if the charitable bequest meets or exceeds 10% of the baseline amount."
+}

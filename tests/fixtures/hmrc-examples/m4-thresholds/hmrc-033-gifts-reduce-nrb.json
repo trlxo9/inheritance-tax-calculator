@@ -1,0 +1,134 @@
+{
+  "source": {
+    "type": "gov_uk",
+    "reference": "RNRB Guidance Example 3",
+    "title": "Lifetime gifts reducing available NRB for estate",
+    "url": "https://www.gov.uk/guidance/inheritance-tax-residence-nil-rate-band",
+    "dateAccessed": "2026-02-08"
+  },
+  "testCase": {
+    "id": "HMRC-033",
+    "milestone": "M4",
+    "priority": "P0",
+    "description": "Gifts within 7 years consume NRB, reducing threshold available for estate",
+    "scenario": "Person dies in 2020-2021 with house £200,000 and other assets £250,000. Made lifetime gifts of £100,000 within 7 years. Gifts consume part of NRB, but RNRB still applies to estate."
+  },
+  "input": {
+    "deceased": {
+      "dateOfDeath": "2020-08-15",
+      "domicileStatus": {
+        "type": "uk_domiciled"
+      },
+      "maritalStatus": {
+        "type": "single"
+      },
+      "hasDirectDescendants": true
+    },
+    "assets": [
+      {
+        "id": "asset-1",
+        "type": "property",
+        "description": "Main residence",
+        "grossValue": "200000",
+        "valuationDate": "2020-08-15",
+        "ownershipShare": "100",
+        "propertyType": "main_residence",
+        "isMainResidence": true
+      },
+      {
+        "id": "asset-2",
+        "type": "financial",
+        "description": "Other assets",
+        "grossValue": "250000",
+        "valuationDate": "2020-08-15",
+        "ownershipShare": "100",
+        "financialType": "investment",
+        "isInTrust": false
+      }
+    ],
+    "liabilities": [],
+    "gifts": [
+      {
+        "id": "gift-1",
+        "giftType": "pet",
+        "dateOfGift": "2018-06-01",
+        "value": "100000",
+        "recipient": {
+          "type": "individual",
+          "name": "Friend",
+          "relationship": "other"
+        },
+        "description": "Cash gift to friend",
+        "isGiftWithReservation": false,
+        "petStatus": "failed"
+      }
+    ],
+    "beneficiaries": [
+      {
+        "id": "ben-1",
+        "name": "Children",
+        "relationship": "child",
+        "inheritanceType": "taxable",
+        "specificBequests": [],
+        "residuaryShare": "100"
+      }
+    ],
+    "residence": {
+      "value": "200000",
+      "passingToDirectDescendants": true,
+      "descendantShare": "100"
+    },
+    "predecessorEstate": null
+  },
+  "expectedOutput": {
+    "grossEstate": "450000",
+    "netEstate": "450000",
+    "totalReliefs": "0",
+    "totalExemptions": "0",
+    "chargeableEstate": "450000",
+    "basicNrb": "325000",
+    "nrbUsedByGifts": "100000",
+    "nrbRemainingForEstate": "225000",
+    "maxRnrb": "175000",
+    "appliedRnrb": "175000",
+    "availableThresholdForEstate": "400000",
+    "taxableAmount": "50000",
+    "taxRate": "40",
+    "giftTax": "0",
+    "estateTax": "20000",
+    "totalTaxPayable": "20000"
+  },
+  "calculationNotes": [
+    "Tax year 2020-2021 with NRB £325,000 and max RNRB £175,000",
+    "Estate: £200,000 (house) + £250,000 (other) = £450,000",
+    "Lifetime gift: £100,000 within 7 years",
+    "",
+    "Step 1: Process lifetime gift",
+    "Gift value: £100,000",
+    "Gift is within 7 years (2018 to 2020 = 2 years)",
+    "Gift uses NRB: £100,000",
+    "Gift within NRB (£100,000 < £325,000), so no tax on gift",
+    "",
+    "Step 2: Calculate remaining NRB for estate",
+    "Basic NRB: £325,000",
+    "Used by gifts: £100,000",
+    "Remaining for estate: £325,000 - £100,000 = £225,000",
+    "",
+    "Step 3: Calculate RNRB (not affected by gifts)",
+    "Property to descendants: £200,000",
+    "Max RNRB: £175,000",
+    "Applied RNRB: min(£175,000, £200,000) = £175,000",
+    "",
+    "Step 4: Calculate total threshold for estate",
+    "NRB remaining: £225,000",
+    "RNRB: £175,000",
+    "Total threshold: £225,000 + £175,000 = £400,000",
+    "",
+    "Step 5: Calculate estate tax",
+    "Estate value: £450,000",
+    "Threshold: £400,000",
+    "Taxable: £450,000 - £400,000 = £50,000",
+    "Tax at 40%: £50,000 × 40% = £20,000"
+  ],
+  "hmrcQuote": "RNRB applies to the estate at death. Lifetime gifts use up the basic nil rate band in chronological order, but the RNRB is still available for the residence passing to direct descendants."
+}

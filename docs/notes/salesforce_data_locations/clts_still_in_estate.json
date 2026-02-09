@@ -1,0 +1,42 @@
+[
+  {
+    "Plan Type": "Gift Plan",
+    "Account Tab": "Financials",
+    "Salesforce Section Used to Identify": "Investment Accounts",
+    "Field used to Identify": "Product and sub product and record type",
+    "Values Required": "Investment bond and blank and Client (Corporate/Trust)",
+    "Other Filters": "For 7 years, total invested "
+  },
+  {
+    "Plan Type": "Enhanced Gift Plan",
+    "Account Tab": "Financials",
+    "Salesforce Section Used to Identify": "Investment Accounts",
+    "Field used to Identify": "Product and sub product and record type",
+    "Values Required": "Investment bond and blank and Client (Corporate/Trust)",
+    "Other Filters": "For 7 years, total invested "
+  },
+  {
+    "Plan Type": "Later Life Planning Scheme",
+    "Account Tab": "Financials",
+    "Salesforce Section Used to Identify": "Investment Accounts",
+    "Field used to Identify": "Product and sub product and record type",
+    "Values Required": "Investment bond and blank and Client (Corporate/Trust)",
+    "Other Filters": "For 7 years, total invested "
+  },
+  {
+    "Plan Type": "Discounted Gift Plan",
+    "Account Tab": "Financials",
+    "Salesforce Section Used to Identify": "Investment Accounts",
+    "Field used to Identify": "Product and sub product",
+    "Values Required": "Investment bond and Discounted Gift Plan",
+    "Other Filters": "For 7 years (total invested - discounted amount). Discounted amount manual input"
+  },
+  {
+    "Plan Type": "Loan Plan",
+    "Account Tab": "Financials",
+    "Salesforce Section Used to Identify": "Investment Accounts",
+    "Field used to Identify": "Product and sub product",
+    "Values Required": "Investment Bond and Loan Plan",
+    "Other Filters": "Total invested - total withdrawn"
+  }
+]

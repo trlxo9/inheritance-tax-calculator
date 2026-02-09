@@ -1,0 +1,131 @@
+{
+  "source": {
+    "type": "synthetic",
+    "reference": "SYN-BPR-001",
+    "title": "Business Property Relief 100% - Sole proprietor trading business",
+    "url": "N/A - Synthetic test case",
+    "dateAccessed": "2026-02-08",
+    "rationale": "No detailed HMRC example showing complete BPR calculation for sole trader business. This is the most common type of business relief claim."
+  },
+  "testCase": {
+    "id": "SYN-BPR-001",
+    "milestone": "M2",
+    "priority": "P0",
+    "description": "Sole proprietor trading business qualifying for 100% BPR, reducing estate significantly",
+    "scenario": "Deceased owned and operated a trading business (plumbing company) as sole proprietor for 8 years. Business valued at £600,000 at death. Also has £200,000 other assets. Business qualifies for 100% BPR."
+  },
+  "input": {
+    "deceased": {
+      "dateOfDeath": "2021-05-20",
+      "domicileStatus": {
+        "type": "uk_domiciled"
+      },
+      "maritalStatus": {
+        "type": "single"
+      },
+      "hasDirectDescendants": true
+    },
+    "assets": [
+      {
+        "id": "asset-1",
+        "type": "business",
+        "description": "Sole proprietor plumbing business",
+        "grossValue": "600000",
+        "valuationDate": "2021-05-20",
+        "ownershipShare": "100",
+        "businessType": "sole_proprietor",
+        "bprEligibility": {
+          "qualifies": true,
+          "reliefRate": 100,
+          "reason": "Trading business owned for 2+ years"
+        },
+        "ownershipDuration": 8
+      },
+      {
+        "id": "asset-2",
+        "type": "financial",
+        "description": "Personal savings and investments",
+        "grossValue": "200000",
+        "valuationDate": "2021-05-20",
+        "ownershipShare": "100",
+        "financialType": "investment",
+        "isInTrust": false
+      }
+    ],
+    "liabilities": [],
+    "gifts": [],
+    "beneficiaries": [
+      {
+        "id": "ben-1",
+        "name": "Children",
+        "relationship": "child",
+        "inheritanceType": "taxable",
+        "specificBequests": [],
+        "residuaryShare": "100"
+      }
+    ],
+    "residence": null,
+    "predecessorEstate": null
+  },
+  "expectedOutput": {
+    "grossEstate": "800000",
+    "netEstate": "800000",
+    "bprDetails": [
+      {
+        "assetId": "asset-1",
+        "assetDescription": "Sole proprietor plumbing business",
+        "grossValue": "600000",
+        "reliefRate": 100,
+        "reliefAmount": "600000",
+        "netValue": "0"
+      }
+    ],
+    "totalBpr": "600000",
+    "totalReliefs": "600000",
+    "chargeableEstate": "200000",
+    "basicNrb": "325000",
+    "availableThreshold": "325000",
+    "taxableAmount": "0",
+    "totalTaxPayable": "0"
+  },
+  "calculationNotes": [
+    "BUSINESS PROPERTY RELIEF - SOLE PROPRIETOR",
+    "",
+    "Step 1: Identify qualifying business",
+    "Business type: Sole proprietor trading business",
+    "Business activity: Plumbing services (trading)",
+    "Ownership duration: 8 years",
+    "Requirement: Minimum 2 years ✓",
+    "Relief rate: 100%",
+    "",
+    "Step 2: Check BPR eligibility",
+    "Requirements for 100% BPR on sole trader business:",
+    "✓ Business used wholly or mainly for trading",
+    "✓ Owned for at least 2 years",
+    "✓ Not an investment business",
+    "✓ Business operational at death",
+    "",
+    "Step 3: Calculate relief",
+    "Business gross value: £600,000",
+    "Relief rate: 100%",
+    "Relief amount: £600,000 × 100% = £600,000",
+    "Net chargeable value of business: £0",
+    "",
+    "Step 4: Calculate total estate",
+    "Gross estate: £600,000 (business) + £200,000 (other) = £800,000",
+    "Less BPR: £600,000",
+    "Chargeable estate: £200,000",
+    "",
+    "Step 5: Calculate tax",
+    "Chargeable estate: £200,000",
+    "NRB: £325,000",
+    "Estate below threshold: No tax payable",
+    "",
+    "KEY POINTS:",
+    "- BPR reduces £800k estate to £200k",
+    "- Saves £240,000 in IHT (£600k × 40%)",
+    "- Must be trading business, not investment",
+    "- 2-year ownership requirement is critical"
+  ],
+  "hmrcQuote": "N/A - Synthetic case. Based on IHTA 1984 s.104 which provides 100% BPR for a business or interest in a business, defined in s.105 as including sole proprietorship, provided the business is mainly trading and owned for 2+ years."
+}

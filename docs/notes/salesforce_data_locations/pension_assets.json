@@ -1,0 +1,9 @@
+[
+  {
+    "Plan Type":"Retirement Account",
+    "Account Tab":"Financials",
+    "Salesforce Section Used to Identify":"Retirement Accounts",
+    "Field used to Identify":"Product",
+    "Values Required":"Retirement Account"
+  }
+]

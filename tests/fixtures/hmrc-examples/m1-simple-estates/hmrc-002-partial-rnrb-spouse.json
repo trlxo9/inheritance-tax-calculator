@@ -1,0 +1,130 @@
+{
+  "source": {
+    "type": "gov_uk",
+    "reference": "RNRB Guidance Example 2",
+    "title": "Partial RNRB usage with spouse exemption",
+    "url": "https://www.gov.uk/guidance/inheritance-tax-residence-nil-rate-band",
+    "dateAccessed": "2026-02-08"
+  },
+  "testCase": {
+    "id": "HMRC-002",
+    "milestone": "M1",
+    "priority": "P0",
+    "description": "Estate with partial RNRB usage and spouse exemption",
+    "scenario": "Woman dies in 2020-2021 leaving flat worth £100,000 to son, other assets £400,000, and £500,000 to spouse (exempt). RNRB is capped at property value passing to descendants."
+  },
+  "input": {
+    "deceased": {
+      "dateOfDeath": "2020-10-15",
+      "domicileStatus": {
+        "type": "uk_domiciled"
+      },
+      "maritalStatus": {
+        "type": "married",
+        "spouseDomicile": "uk"
+      },
+      "hasDirectDescendants": true
+    },
+    "assets": [
+      {
+        "id": "asset-1",
+        "type": "property",
+        "description": "Flat",
+        "grossValue": "100000",
+        "valuationDate": "2020-10-15",
+        "ownershipShare": "100",
+        "propertyType": "main_residence",
+        "isMainResidence": true
+      },
+      {
+        "id": "asset-2",
+        "type": "financial",
+        "description": "Other taxable assets to son",
+        "grossValue": "400000",
+        "valuationDate": "2020-10-15",
+        "ownershipShare": "100",
+        "financialType": "investment",
+        "isInTrust": false
+      },
+      {
+        "id": "asset-3",
+        "type": "financial",
+        "description": "Assets to spouse",
+        "grossValue": "500000",
+        "valuationDate": "2020-10-15",
+        "ownershipShare": "100",
+        "financialType": "investment",
+        "isInTrust": false
+      }
+    ],
+    "liabilities": [],
+    "gifts": [],
+    "beneficiaries": [
+      {
+        "id": "ben-1",
+        "name": "Son",
+        "relationship": "child",
+        "inheritanceType": "taxable",
+        "specificBequests": [
+          {
+            "assetId": "asset-1",
+            "isTaxFree": false
+          },
+          {
+            "assetId": "asset-2",
+            "isTaxFree": false
+          }
+        ],
+        "residuaryShare": "0"
+      },
+      {
+        "id": "ben-2",
+        "name": "Spouse",
+        "relationship": "spouse",
+        "inheritanceType": "exempt_spouse",
+        "specificBequests": [
+          {
+            "assetId": "asset-3",
+            "isTaxFree": false
+          }
+        ],
+        "residuaryShare": "0"
+      }
+    ],
+    "residence": {
+      "value": "100000",
+      "passingToDirectDescendants": true,
+      "descendantShare": "100"
+    },
+    "predecessorEstate": null
+  },
+  "expectedOutput": {
+    "grossEstate": "1000000",
+    "netEstate": "1000000",
+    "totalReliefs": "0",
+    "spouseExemption": "500000",
+    "totalExemptions": "500000",
+    "chargeableEstate": "500000",
+    "basicNrb": "325000",
+    "maxRnrb": "175000",
+    "appliedRnrb": "100000",
+    "availableThreshold": "425000",
+    "taxableAmount": "75000",
+    "taxRate": "40",
+    "totalTaxPayable": "30000",
+    "unusedRnrb": "75000"
+  },
+  "calculationNotes": [
+    "Tax year 2020-2021 with NRB £325,000 and max RNRB £175,000",
+    "Gross estate: £100,000 (flat) + £400,000 (other) + £500,000 (to spouse) = £1,000,000",
+    "Spouse exemption: £500,000 (fully exempt)",
+    "Taxable estate: £1,000,000 - £500,000 = £500,000",
+    "RNRB: min(£175,000 max, £100,000 property to descendants) = £100,000",
+    "Note: RNRB is capped at the lower of max RNRB or property value passing to descendants",
+    "Combined threshold: £325,000 + £100,000 = £425,000",
+    "Taxable amount: £500,000 - £425,000 = £75,000",
+    "Tax at 40%: £75,000 × 40% = £30,000",
+    "Unused RNRB available for transfer to spouse: £175,000 - £100,000 = £75,000"
+  ],
+  "hmrcQuote": "The maximum available residence nil rate band in 2020 to 2021 is £175,000, but since the flat left to the son is only worth £100,000, only £100,000 of the tax-free residence allowance applies. The remaining residence nil rate band of £75,000 is available to transfer to the husband's estate."
+}

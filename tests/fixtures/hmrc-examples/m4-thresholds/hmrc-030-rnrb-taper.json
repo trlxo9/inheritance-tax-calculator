@@ -1,0 +1,98 @@
+{
+  "source": {
+    "type": "gov_uk",
+    "reference": "RNRB Guidance Example 5",
+    "title": "RNRB taper for estate over £2 million",
+    "url": "https://www.gov.uk/guidance/inheritance-tax-residence-nil-rate-band",
+    "dateAccessed": "2026-02-08"
+  },
+  "testCase": {
+    "id": "HMRC-030",
+    "milestone": "M4",
+    "priority": "P0",
+    "description": "RNRB taper calculation for estate exceeding £2M threshold",
+    "scenario": "Man dies in 2018-2019 leaving an estate worth £2,100,000 including a home valued at £450,000. RNRB is reduced due to estate exceeding the £2 million taper threshold."
+  },
+  "input": {
+    "deceased": {
+      "dateOfDeath": "2018-12-01",
+      "domicileStatus": {
+        "type": "uk_domiciled"
+      },
+      "maritalStatus": {
+        "type": "single"
+      },
+      "hasDirectDescendants": true
+    },
+    "assets": [
+      {
+        "id": "asset-1",
+        "type": "property",
+        "description": "Main residence",
+        "grossValue": "450000",
+        "valuationDate": "2018-12-01",
+        "ownershipShare": "100",
+        "propertyType": "main_residence",
+        "isMainResidence": true
+      },
+      {
+        "id": "asset-2",
+        "type": "financial",
+        "description": "Other assets",
+        "grossValue": "1650000",
+        "valuationDate": "2018-12-01",
+        "ownershipShare": "100",
+        "financialType": "investment",
+        "isInTrust": false
+      }
+    ],
+    "liabilities": [],
+    "gifts": [],
+    "beneficiaries": [
+      {
+        "id": "ben-1",
+        "name": "Children",
+        "relationship": "child",
+        "inheritanceType": "taxable",
+        "specificBequests": [],
+        "residuaryShare": "100"
+      }
+    ],
+    "residence": {
+      "value": "450000",
+      "passingToDirectDescendants": true,
+      "descendantShare": "100"
+    },
+    "predecessorEstate": null
+  },
+  "expectedOutput": {
+    "grossEstate": "2100000",
+    "netEstate": "2100000",
+    "totalReliefs": "0",
+    "totalExemptions": "0",
+    "chargeableEstate": "2100000",
+    "basicNrb": "325000",
+    "maxRnrb": "125000",
+    "taperThreshold": "2000000",
+    "amountOverTaperThreshold": "100000",
+    "taperReduction": "50000",
+    "appliedRnrb": "75000",
+    "availableThreshold": "400000",
+    "taxableAmount": "1700000",
+    "taxRate": "40",
+    "totalTaxPayable": "680000"
+  },
+  "calculationNotes": [
+    "Tax year 2018-2019 with NRB £325,000 and max RNRB £125,000",
+    "Gross estate: £450,000 (home) + £1,650,000 (other) = £2,100,000",
+    "Net estate: £2,100,000 (no liabilities)",
+    "RNRB taper threshold: £2,000,000",
+    "Amount over threshold: £2,100,000 - £2,000,000 = £100,000",
+    "Taper reduction: £100,000 ÷ 2 = £50,000 (£1 reduction per £2 over threshold)",
+    "Net RNRB: £125,000 - £50,000 = £75,000",
+    "Combined threshold: £325,000 + £75,000 = £400,000",
+    "Taxable amount: £2,100,000 - £400,000 = £1,700,000",
+    "Tax at 40%: £1,700,000 × 40% = £680,000"
+  ],
+  "hmrcQuote": "The maximum residence nil rate band in the tax year 2018 to 2019 is £125,000. The amount the estate is entitled to is reduced or tapered away for estates worth more than £2 million by £1 for every £2 over £2 million. In this example, the net estate after liabilities is £2,100,000. The estate is £100,000 over the taper threshold, so the available residence nil rate band is reduced by £50,000 to £75,000."
+}

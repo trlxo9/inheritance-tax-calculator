@@ -1,0 +1,8 @@
+[
+  {"Plan Type":"Designated UT","Account Tab":"Financials","Salesforce Section Used to Identify":"Investment Accounts","Field used to Identify":"Product and designation","Values Required":"Unit Trust and name","Other Filters":"After 7 years"},
+  {"Plan Type":"Loan Plan","Account Tab":"Financials","Salesforce Section Used to Identify":"Investment Accounts","Field used to Identify":"Product and sub product","Values Required":"Investment Bond and Loan Plan","Other Filters":"All growth + income paid out"},
+  {"Plan Type":"Gift Plan","Account Tab":"Financials","Salesforce Section Used to Identify":"Investment Accounts","Field used to Identify":"Product and sub product","Values Required":"Investment Bond and blank","Other Filters":"All growth "},
+  {"Plan Type":"Discounted Gift Plan","Account Tab":"Financials ","Salesforce Section Used to Identify":"Investment Accounts","Field used to Identify":"Product and sub product","Values Required":"Investment Bond and Discounted Gift Plan","Other Filters":"All growth + discount"},
+  {"Plan Type":"EIS/Business Property Release","Account Tab":"Financials","Salesforce Section Used to Identify":"Investment Accounts","Field used to Identify":"Product","Values Required":"Provider and EIS","Other Filters":"After 2 years"},
+  {"Plan Type":"Trustee Bond & IRIB ","Account Tab":"Financials","Salesforce Section Used to Identify":"Investment Accounts","Field used to Identify":"","Values Required":"","Other Filters":"Outside straight away"}
+  ]

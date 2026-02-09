@@ -1,0 +1,33 @@
+[
+  {
+    "Plan Type":"Life Cover",
+    "Account Tab":"Financials",
+    "Salesforce Section Used to Identify":"Protection Accounts",
+    "Field used to Identify":"Product",
+    "Values Required":"Whole of Life, Level Term Assurance, Life Cover Plan, Decreasing Term Assurance, Relevant Life Policy, General Insurance, Whole of Life - Flexible, Increasing Term Assurance,",
+    "Other Filters":"Outside of estate "
+  },
+  {
+    "Plan Type":"Income Protection",
+    "Account Tab":"Financials",
+    "Salesforce Section Used to Identify":"Protection Accounts",
+    "Field used to Identify":"Product",
+    "Values Required":"Income Protection",
+    "Other Filters":""
+  },
+  {
+    "Plan Type":"Mortgage Protection",
+    "Account Tab":"Financials",
+    "Salesforce Section Used to Identify":"Protection Accounts",
+    "Field used to Identify":"Product",
+    "Values Required":"Mortgage Protection",
+    "Other Filters":""
+  },
+  {
+    "Plan Type":"Business Protection",
+    "Account Tab":"Financials",
+    "Salesforce Section Used to Identify":"Protection Accounts",
+    "Field used to Identify":"Product",
+    "Values Required":"Business Protection,"
+  }
+]

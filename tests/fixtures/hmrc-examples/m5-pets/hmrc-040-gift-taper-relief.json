@@ -1,0 +1,94 @@
+{
+  "source": {
+    "type": "hmrc_manual",
+    "reference": "IHTM14612",
+    "title": "Taper relief calculation - Julia's example",
+    "url": "https://www.gov.uk/hmrc-internal-manuals/inheritance-tax-manual/ihtm14612",
+    "dateAccessed": "2026-02-08"
+  },
+  "testCase": {
+    "id": "HMRC-040",
+    "milestone": "M5",
+    "priority": "P0",
+    "description": "PET with taper relief for gift made 3-4 years before death",
+    "scenario": "Julia makes a gift of £375,000 on 1 February 2009 and dies on 20 June 2012. The gift is over 3 years but less than 4 years from the date of death. £50,000 of the gift exceeds the nil rate band, so taper relief applies."
+  },
+  "input": {
+    "deceased": {
+      "dateOfDeath": "2012-06-20",
+      "domicileStatus": {
+        "type": "uk_domiciled"
+      },
+      "maritalStatus": {
+        "type": "single"
+      },
+      "hasDirectDescendants": false
+    },
+    "assets": [],
+    "liabilities": [],
+    "gifts": [
+      {
+        "id": "gift-1",
+        "giftType": "pet",
+        "dateOfGift": "2009-02-01",
+        "value": "375000",
+        "recipient": {
+          "type": "individual",
+          "name": "Unnamed beneficiary",
+          "relationship": "other"
+        },
+        "description": "Cash gift",
+        "isGiftWithReservation": false,
+        "petStatus": "failed"
+      }
+    ],
+    "beneficiaries": [],
+    "residence": null,
+    "predecessorEstate": null
+  },
+  "expectedOutput": {
+    "grossEstate": "0",
+    "netEstate": "0",
+    "totalReliefs": "0",
+    "totalExemptions": "0",
+    "chargeableEstate": "0",
+    "basicNrb": "325000",
+    "availableThreshold": "325000",
+    "giftAnalysis": {
+      "giftId": "gift-1",
+      "giftValue": "375000",
+      "dateOfGift": "2009-02-01",
+      "dateOfDeath": "2012-06-20",
+      "yearsBeforeDeath": 3.38,
+      "withinSevenYears": true,
+      "annualExemptionApplied": "0",
+      "chargeableValue": "375000",
+      "nrbAvailable": "325000",
+      "amountOverNrb": "50000",
+      "fullTaxRate": "40",
+      "taxAtFullRate": "20000",
+      "taperBand": "3-4 years",
+      "taperPercentage": "20",
+      "taxAfterTaper": "16000",
+      "taperReliefGiven": "4000",
+      "paidBy": "recipient"
+    },
+    "estateTax": "0",
+    "giftTax": "16000",
+    "totalTaxPayable": "16000"
+  },
+  "calculationNotes": [
+    "Gift made: 1 February 2009",
+    "Death: 20 June 2012",
+    "Time between: approximately 3 years 4 months (within 3-4 year band)",
+    "Gift value: £375,000",
+    "NRB at death: £325,000",
+    "Amount exceeding NRB: £375,000 - £325,000 = £50,000",
+    "Tax at full rate (40%): £50,000 × 40% = £20,000",
+    "Taper band: 3-4 years → relief is 20% (tax is 80% of full)",
+    "Tax after taper: £20,000 × 80% = £16,000",
+    "Relief given: £20,000 - £16,000 = £4,000",
+    "Tax payable by recipient: £16,000"
+  ],
+  "hmrcQuote": "Julia makes a gift of £375,000 on 1 February 2009 and dies on 20 June 2012. £50,000 of the gift exceeds the £325,000 nil rate band. The full rate of tax is 40% × £50,000 = £20,000. The gift is over three years, but less than four years before Julia's death, so the revised tax charge is £20,000 × 80% = £16,000 (the relief is £4,000)."
+}

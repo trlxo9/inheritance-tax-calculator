@@ -1,0 +1,52 @@
+[
+  {
+    "Plan Type":"UT/UTF",
+  "Account Tab":"Financials",
+  "Salesforce Section Used to Identify":"Investment Accounts",
+  "Field used to Identify":"Product",
+  "Values Required":"Unit Trust",
+  "Other Filters":"In assets section forever"
+  },
+  {"Plan Type":"EIS/Business Property Release",
+  "Account Tab":"Financials",
+  "Salesforce Section Used to Identify":"Investment Accounts",
+  "Field used to Identify":"Product",
+  "Values Required":"Provider and EIS",
+  "Other Filters":"For 2 years, then outside the estate\"\nISA,Financials,Investment Accounts,Product,Individual Savings Account,In assets section forever\nJISA,Details,Personal Details,Age,Client age,In assets section forever\nProperty,Financials,Assets,Type,\"Property - residential, Property - Holiday, Property - Holiday, Property - Commercial"
+  },
+  {"Plan Type":"Bank Account",
+  "Account Tab":"Financials",
+  "Salesforce Section Used to Identify":"Bank Accounts",
+  "Field used to Identify":"Product",
+  "Values Required":"Bank Current Account, Bank Deposit Account, Bank Account, Savings Account",
+  "Other Filters":"In assets section forever"
+  },
+  {"Plan Type":"Premium Bonds",
+  "Account Tab":"Financials",
+  "Salesforce Section Used to Identify":"Investment Accounts",
+  "Field used to Identify":"Product",
+  "Values Required":"Premium Bonds",
+  "Other Filters":"In assets section forever"
+  },
+  {"Plan Type":"Shares",
+  "Account Tab":"Financials",
+  "Salesforce Section Used to Identify":"Investment Accounts",
+  "Field used to Identify":"Product",
+  "Values Required":"Share Portfolio",
+  "Other Filters":"In assets section forever"
+  },
+  {"Plan Type":"International Investment Bond",
+  "Account Tab":"Financials",
+  "Salesforce Section Used to Identify":"Investment Accounts",
+  "Field used to Identify":"Product",
+  "Values Required":"International Investment Bond",
+  "Other Filters":"In assets section forever"
+  },
+  {"Plan Type":"Investment Bond",
+  "Account Tab":"Financials",
+  "Salesforce Section Used to Identify":"Investment Accounts",
+  "Field used to Identify":"Product",
+  "Values Required":"Investment Bond",
+  "Other Filters":"In assets section forever"
+  }
+]

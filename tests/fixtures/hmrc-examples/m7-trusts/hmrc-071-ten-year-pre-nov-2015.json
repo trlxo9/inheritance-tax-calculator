@@ -1,0 +1,75 @@
+{
+  "source": {
+    "type": "hmrc_manual",
+    "reference": "IHTM42087",
+    "title": "Ten year anniversary charge (pre-November 2015 rules) - George's trust",
+    "url": "https://www.gov.uk/hmrc-internal-manuals/inheritance-tax-manual/ihtm42087",
+    "dateAccessed": "2026-02-08"
+  },
+  "testCase": {
+    "id": "HMRC-071",
+    "milestone": "M7",
+    "priority": "P1",
+    "description": "10-year charge using pre-Nov 2015 rules (includes non-relevant property)",
+    "scenario": "George's trust reaches 10-year anniversary before 18 November 2015. Under old rules, non-relevant property is included in notional transfer calculation. Trust has £1,000,000 relevant property, related settlements £200,000, and non-relevant property £150,000."
+  },
+  "trustDetails": {
+    "trustType": "discretionary",
+    "settlementDate": "2005-01-10",
+    "anniversaryDate": "2015-01-10",
+    "trustValue": "1000000",
+    "settlor": {
+      "name": "George",
+      "lifetimeTransfersInSevenYears": "0"
+    }
+  },
+  "input": {
+    "notionalLifetimeTransfer": "1350000",
+    "availableNilRateBand": "76000",
+    "relevantPropertyValue": "1000000",
+    "relatedSettlements": "200000",
+    "nonRelevantProperty": "150000"
+  },
+  "expectedOutput": {
+    "notionalTransfer": "1350000",
+    "availableNrb": "76000",
+    "excessOverNrb": "1274000",
+    "hypotheticalTaxAt20Percent": "254800",
+    "effectiveRate": "18.874074",
+    "anniversaryRate": "5.662222",
+    "taxOnRelevantProperty": "56622",
+    "maxRateCap": "6",
+    "cappedTax": "56622"
+  },
+  "calculationNotes": [
+    "PRE-NOVEMBER 2015 RULES",
+    "For anniversaries before 18 November 2015, non-relevant property is included",
+    "",
+    "Step 1: Determine notional lifetime transfer",
+    "Relevant property: £1,000,000",
+    "Related settlements (same day): £200,000",
+    "Non-relevant property: £150,000",
+    "Notional transfer = £1,000,000 + £200,000 + £150,000 = £1,350,000",
+    "",
+    "Step 2: Apply NRB",
+    "Available NRB: £76,000 (heavily reduced)",
+    "Excess over NRB: £1,350,000 - £76,000 = £1,274,000",
+    "",
+    "Step 3: Calculate hypothetical rate",
+    "Tax on excess at 20%: £1,274,000 × 20% = £254,800",
+    "Effective rate: (£254,800 / £1,350,000) × 100 = 18.874%",
+    "",
+    "Step 4: Apply 3/10 multiplier",
+    "Anniversary rate: 18.874% × 3/10 = 5.662%",
+    "",
+    "Step 5: Calculate tax (on RELEVANT property only)",
+    "Tax on relevant property: £1,000,000 × 5.662% = £56,622",
+    "",
+    "Note: Non-relevant property affects RATE calculation but tax applies only to relevant property",
+    "",
+    "Step 6: Check 6% cap",
+    "Maximum charge: £1,000,000 × 6% = £60,000",
+    "Actual charge £56,622 < £60,000, so no capping required"
+  ],
+  "hmrcQuote": "George's notional lifetime transfer totaled £1,350,000 (including related settlements and non-relevant property). With only £76,000 nil rate band remaining, the effective rate was 18.874%, giving an anniversary rate of 5.662%. Tax on £1,000,000 relevant property: £56,620."
+}

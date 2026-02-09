@@ -1,0 +1,135 @@
+{
+  "source": {
+    "type": "hmrc_manual",
+    "reference": "IHTM31033",
+    "title": "Quick Succession Relief with apportionment - Roger's estate",
+    "url": "https://www.gov.uk/hmrc-internal-manuals/inheritance-tax-manual/ihtm31033",
+    "dateAccessed": "2026-02-08"
+  },
+  "testCase": {
+    "id": "HMRC-082",
+    "milestone": "M8",
+    "priority": "P1",
+    "description": "QSR calculation with proportional apportionment between free estate and trust property",
+    "scenario": "Roger's estate comprises £200,000 free estate and £300,000 Will trust (total £500,000). He made lifetime gifts of £25,000. QSR of £10,000 is available and must be apportioned between the two entries proportionally to their tax liability."
+  },
+  "input": {
+    "deceased": {
+      "dateOfDeath": "2020-06-15",
+      "domicileStatus": {
+        "type": "uk_domiciled"
+      },
+      "maritalStatus": {
+        "type": "single"
+      },
+      "hasDirectDescendants": false
+    },
+    "assets": [
+      {
+        "id": "asset-1",
+        "type": "financial",
+        "description": "Free estate assets",
+        "grossValue": "200000",
+        "valuationDate": "2020-06-15",
+        "ownershipShare": "100",
+        "financialType": "investment",
+        "isInTrust": false
+      },
+      {
+        "id": "asset-2",
+        "type": "trust_interest",
+        "description": "Will trust property",
+        "grossValue": "300000",
+        "valuationDate": "2020-06-15",
+        "ownershipShare": "100",
+        "trustType": "discretionary",
+        "trustId": "trust-1"
+      }
+    ],
+    "liabilities": [],
+    "gifts": [
+      {
+        "id": "gift-1",
+        "giftType": "pet",
+        "dateOfGift": "2018-01-10",
+        "value": "25000",
+        "recipient": {
+          "type": "individual",
+          "name": "Beneficiary",
+          "relationship": "other"
+        },
+        "description": "Lifetime gift",
+        "isGiftWithReservation": false,
+        "petStatus": "failed"
+      }
+    ],
+    "beneficiaries": [],
+    "quickSuccessionRelief": {
+      "previousDeath": "2018-08-01",
+      "taxPaidOnInheritance": "12500",
+      "yearsBeforeDeath": 1.87,
+      "reliefPercentage": "80",
+      "qsrAmount": "10000"
+    }
+  },
+  "expectedOutput": {
+    "grossEstate": "500000",
+    "netEstate": "500000",
+    "totalReliefs": "0",
+    "totalExemptions": "0",
+    "chargeableEstate": "500000",
+    "basicNrb": "325000",
+    "nrbToGifts": "25000",
+    "nrbToEstate": "300000",
+    "entryAValue": "200000",
+    "entryANrb": "120000",
+    "entryATaxableAmount": "80000",
+    "entryATaxBeforeQsr": "32000",
+    "entryBValue": "300000",
+    "entryBNrb": "180000",
+    "entryBTaxableAmount": "120000",
+    "entryBTaxBeforeQsr": "48000",
+    "totalTaxBeforeQsr": "80000",
+    "qsrTotal": "10000",
+    "qsrToEntryA": "4000",
+    "qsrToEntryB": "6000",
+    "entryAFinalTax": "28000",
+    "entryBFinalTax": "42000",
+    "giftTax": "0",
+    "estateTax": "70000",
+    "totalTaxPayable": "70000"
+  },
+  "calculationNotes": [
+    "Roger's estate has two entries:",
+    "  Entry A (free estate): £200,000",
+    "  Entry B (Will trust): £300,000",
+    "  Total chargeable estate: £500,000",
+    "",
+    "Step 1: Apply NRB",
+    "Total NRB available: £325,000",
+    "NRB used by lifetime gifts: £25,000",
+    "NRB remaining for estate: £325,000 - £25,000 = £300,000",
+    "",
+    "Step 2: Apportion NRB between entries",
+    "Entry A NRB: £300,000 × (£200,000 / £500,000) = £120,000",
+    "Entry B NRB: £300,000 × (£300,000 / £500,000) = £180,000",
+    "",
+    "Step 3: Calculate tax before QSR",
+    "Entry A taxable: £200,000 - £120,000 = £80,000",
+    "Entry A tax: £80,000 × 40% = £32,000",
+    "Entry B taxable: £300,000 - £180,000 = £120,000",
+    "Entry B tax: £120,000 × 40% = £48,000",
+    "Total tax: £32,000 + £48,000 = £80,000",
+    "",
+    "Step 4: Apportion QSR",
+    "QSR available: £10,000",
+    "QSR to Entry A: £10,000 × (£32,000 / £80,000) = £4,000",
+    "QSR to Entry B: £10,000 × (£48,000 / £80,000) = £6,000",
+    "",
+    "Step 5: Calculate final tax",
+    "Entry A final tax: £32,000 - £4,000 = £28,000",
+    "Entry B final tax: £48,000 - £6,000 = £42,000",
+    "Total tax payable: £28,000 + £42,000 = £70,000"
+  },
+  "hmrcQuote": "Roger's estate comprised £200,000 free estate and £300,000 Will trust, totaling £500,000 chargeable value. The £10,000 QSR was allocated proportionally: Entry A received £4,000 QSR and Entry B received £6,000 QSR. Final amounts due: Entry A £28,000 and Entry B £42,000."
+}

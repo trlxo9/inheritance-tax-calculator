@@ -1,0 +1,97 @@
+{
+  "source": {
+    "type": "gov_uk",
+    "reference": "RNRB Guidance Example 1",
+    "title": "Basic estate with RNRB - under threshold",
+    "url": "https://www.gov.uk/guidance/inheritance-tax-residence-nil-rate-band",
+    "dateAccessed": "2026-02-08"
+  },
+  "testCase": {
+    "id": "HMRC-001",
+    "milestone": "M1",
+    "priority": "P0",
+    "description": "Basic estate calculation with RNRB application, no tax payable",
+    "scenario": "Woman dies in 2020-2021 leaving a home worth £300,000 and other assets worth £190,000 (total £490,000). All assets pass to direct descendants. Estate is under the combined NRB + RNRB threshold."
+  },
+  "input": {
+    "deceased": {
+      "dateOfDeath": "2021-01-15",
+      "domicileStatus": {
+        "type": "uk_domiciled"
+      },
+      "maritalStatus": {
+        "type": "single"
+      },
+      "hasDirectDescendants": true
+    },
+    "assets": [
+      {
+        "id": "asset-1",
+        "type": "property",
+        "description": "Main residence",
+        "grossValue": "300000",
+        "valuationDate": "2021-01-15",
+        "ownershipShare": "100",
+        "propertyType": "main_residence",
+        "isMainResidence": true
+      },
+      {
+        "id": "asset-2",
+        "type": "financial",
+        "description": "Other assets (savings, investments)",
+        "grossValue": "190000",
+        "valuationDate": "2021-01-15",
+        "ownershipShare": "100",
+        "financialType": "investment",
+        "isInTrust": false
+      }
+    ],
+    "liabilities": [],
+    "gifts": [],
+    "beneficiaries": [
+      {
+        "id": "ben-1",
+        "name": "Children",
+        "relationship": "child",
+        "inheritanceType": "taxable",
+        "specificBequests": [],
+        "residuaryShare": "100"
+      }
+    ],
+    "residence": {
+      "value": "300000",
+      "passingToDirectDescendants": true,
+      "descendantShare": "100"
+    },
+    "predecessorEstate": null
+  },
+  "expectedOutput": {
+    "grossEstate": "490000",
+    "netEstate": "490000",
+    "totalReliefs": "0",
+    "totalExemptions": "0",
+    "chargeableEstate": "490000",
+    "basicNrb": "325000",
+    "maxRnrb": "175000",
+    "appliedRnrb": "175000",
+    "availableThreshold": "500000",
+    "taxableAmount": "0",
+    "taxRate": "40",
+    "totalTaxPayable": "0",
+    "unusedBasicNrb": "10000",
+    "unusedRnrb": "0"
+  },
+  "calculationNotes": [
+    "Tax year 2020-2021 with NRB £325,000 and max RNRB £175,000",
+    "Gross estate: £300,000 (home) + £190,000 (other) = £490,000",
+    "No liabilities to deduct",
+    "Net estate = £490,000",
+    "RNRB: min(£175,000 max, £300,000 property value × 100% to descendants) = £175,000",
+    "No transferred NRB or RNRB (single person)",
+    "Combined threshold: £325,000 + £175,000 = £500,000",
+    "Chargeable estate £490,000 < threshold £500,000",
+    "Tax payable: £0",
+    "Unused basic NRB available for transfer: £500,000 - £490,000 = £10,000"
+  ],
+  "hmrcQuote": "The maximum available residence nil rate band in 2020 to 2021 is £175,000. The full residence nil rate band has been used up, but £10,000 of the basic Inheritance Tax threshold of £325,000 has not been used. This would be available to transfer to their spouse or civil partner."
+}

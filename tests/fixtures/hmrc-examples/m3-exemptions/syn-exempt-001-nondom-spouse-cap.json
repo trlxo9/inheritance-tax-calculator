@@ -1,0 +1,116 @@
+{
+  "source": {
+    "type": "synthetic",
+    "reference": "SYN-EXEMPT-001",
+    "title": "Non-UK domiciled spouse exemption cap",
+    "url": "N/A - Synthetic test case",
+    "dateAccessed": "2026-02-08",
+    "rationale": "HMRC manual references non-dom spouse cap but no worked calculation example found. This is important for international estates and mixed-domicile couples."
+  },
+  "testCase": {
+    "id": "SYN-EXEMPT-001",
+    "milestone": "M3",
+    "priority": "P0",
+    "description": "Spouse exemption capped at NRB for non-UK domiciled spouse (no election made)",
+    "scenario": "UK-domiciled deceased leaves £500,000 to non-UK domiciled spouse. No election made under IHTA 1984 s.267ZA. Spouse exemption is capped at the nil-rate band (£325,000), with excess being taxable."
+  },
+  "input": {
+    "deceased": {
+      "dateOfDeath": "2021-03-10",
+      "domicileStatus": {
+        "type": "uk_domiciled"
+      },
+      "maritalStatus": {
+        "type": "married",
+        "spouseDomicile": "non_uk"
+      },
+      "hasDirectDescendants": false
+    },
+    "assets": [
+      {
+        "id": "asset-1",
+        "type": "financial",
+        "description": "Estate to spouse",
+        "grossValue": "500000",
+        "valuationDate": "2021-03-10",
+        "ownershipShare": "100",
+        "financialType": "investment",
+        "isInTrust": false
+      }
+    ],
+    "liabilities": [],
+    "gifts": [],
+    "beneficiaries": [
+      {
+        "id": "ben-1",
+        "name": "Non-UK Domiciled Spouse",
+        "relationship": "spouse",
+        "inheritanceType": "exempt_spouse",
+        "specificBequests": [],
+        "residuaryShare": "100"
+      }
+    ],
+    "residence": null,
+    "predecessorEstate": null
+  },
+  "expectedOutput": {
+    "grossEstate": "500000",
+    "netEstate": "500000",
+    "spouseBequestAmount": "500000",
+    "spouseDomicile": "non_uk",
+    "electionMade": false,
+    "spouseExemptionCap": "325000",
+    "spouseExemptionApplied": "325000",
+    "excessOverCap": "175000",
+    "totalExemptions": "325000",
+    "chargeableEstate": "175000",
+    "basicNrb": "325000",
+    "nrbUsedBySpouseExemption": "325000",
+    "nrbRemainingForTaxCalculation": "0",
+    "taxableAmount": "175000",
+    "taxRate": "40",
+    "totalTaxPayable": "70000",
+    "warnings": [
+      {
+        "code": "W001",
+        "severity": "warning",
+        "message": "Spouse exemption capped at £325,000 due to non-UK domicile. Consider making an election under IHTA 1984 s.267ZA to access unlimited exemption."
+      }
+    ]
+  },
+  "calculationNotes": [
+    "NON-UK DOMICILED SPOUSE EXEMPTION CAP",
+    "",
+    "Step 1: Identify spouse domicile",
+    "Deceased: UK domiciled",
+    "Spouse: Non-UK domiciled",
+    "Election under s.267ZA: Not made",
+    "",
+    "Step 2: Determine exemption limit",
+    "For non-UK domiciled spouse without election:",
+    "Exemption capped at NRB = £325,000",
+    "",
+    "Step 3: Apply capped exemption",
+    "Bequest to spouse: £500,000",
+    "Maximum exemption: £325,000",
+    "Exempt amount: min(£500,000, £325,000) = £325,000",
+    "Excess over cap: £500,000 - £325,000 = £175,000",
+    "",
+    "Step 4: Calculate tax on excess",
+    "The £175,000 excess is taxable",
+    "NRB already used by the capped exemption: £325,000",
+    "NRB remaining: £0",
+    "Taxable amount: £175,000",
+    "Tax at 40%: £175,000 × 40% = £70,000",
+    "",
+    "Alternative: If election made under s.267ZA",
+    "- Spouse treated as UK domiciled",
+    "- Unlimited exemption available",
+    "- Full £500,000 would be exempt",
+    "- No tax payable",
+    "- But spouse's worldwide assets then subject to UK IHT",
+    "",
+    "Warning message should alert executor to election option"
+  ],
+  "hmrcQuote": "N/A - Synthetic case. Based on IHTA 1984 s.18 which limits spouse exemption to the nil-rate band where the spouse is not domiciled in the UK, unless an election is made under s.267ZA to treat the spouse as UK domiciled."
+}

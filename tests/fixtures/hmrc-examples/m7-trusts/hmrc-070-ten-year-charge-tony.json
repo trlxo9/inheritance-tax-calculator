@@ -1,0 +1,67 @@
+{
+  "source": {
+    "type": "hmrc_manual",
+    "reference": "IHTM42087",
+    "title": "Ten year anniversary charge - Tony's trust",
+    "url": "https://www.gov.uk/hmrc-internal-manuals/inheritance-tax-manual/ihtm42087",
+    "dateAccessed": "2026-02-08"
+  },
+  "testCase": {
+    "id": "HMRC-070",
+    "milestone": "M7",
+    "priority": "P0",
+    "description": "Basic 10-year anniversary charge calculation for discretionary trust",
+    "scenario": "Trust reaches 10-year anniversary. Notional lifetime transfer is £450,000 with available nil rate band of £275,000. Calculate the periodic charge."
+  },
+  "trustDetails": {
+    "trustType": "discretionary",
+    "settlementDate": "2005-04-01",
+    "anniversaryDate": "2015-04-01",
+    "trustValue": "450000",
+    "settlor": {
+      "name": "Tony",
+      "lifetimeTransfersInSevenYears": "0"
+    }
+  },
+  "input": {
+    "notionalLifetimeTransfer": "450000",
+    "availableNilRateBand": "275000",
+    "relevantPropertyValue": "450000",
+    "relatedSettlements": "0",
+    "nonRelevantProperty": "0"
+  },
+  "expectedOutput": {
+    "notionalTransfer": "450000",
+    "availableNrb": "275000",
+    "excessOverNrb": "175000",
+    "hypotheticalTaxAt20Percent": "35000",
+    "effectiveRate": "7.777777",
+    "anniversaryRate": "2.333333",
+    "taxOnTrustValue": "10498.50",
+    "maxRateCap": "6",
+    "cappedTax": "10498.50"
+  },
+  "calculationNotes": [
+    "Step 1: Determine notional lifetime transfer",
+    "Notional transfer = relevant property (£450,000) + related settlements (£0) = £450,000",
+    "",
+    "Step 2: Apply NRB",
+    "Available NRB: £275,000",
+    "Excess over NRB: £450,000 - £275,000 = £175,000",
+    "",
+    "Step 3: Calculate hypothetical rate",
+    "Tax on excess at 20%: £175,000 × 20% = £35,000",
+    "Effective rate: (£35,000 / £450,000) × 100 = 7.777%",
+    "",
+    "Step 4: Apply 3/10 multiplier for periodic charge",
+    "Anniversary rate: 7.777% × 3/10 = 2.333%",
+    "",
+    "Step 5: Calculate tax",
+    "Tax on trust value: £450,000 × 2.333% = £10,498.50",
+    "",
+    "Step 6: Check against 6% cap",
+    "Maximum charge: £450,000 × 6% = £27,000",
+    "Actual charge £10,498.50 < £27,000, so no capping required"
+  ],
+  "hmrcQuote": "Tony's notional transfer was £450,000 with an available nil rate band of £275,000. The difference is £175,000. 20% of £175,000 is £35,000. The effective rate is £35,000 / £450,000 = 7.777%. Multiplied by 3/10 gives a rate of 2.333%. The tax due is £10,498.50."
+}

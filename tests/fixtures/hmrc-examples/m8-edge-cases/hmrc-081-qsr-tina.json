@@ -1,0 +1,125 @@
+{
+  "source": {
+    "type": "hmrc_manual",
+    "reference": "IHTM22045",
+    "title": "Quick Succession Relief - Tina's apportioned example",
+    "url": "https://www.gov.uk/hmrc-internal-manuals/inheritance-tax-manual/ihtm22045",
+    "dateAccessed": "2026-02-08"
+  },
+  "testCase": {
+    "id": "HMRC-081",
+    "milestone": "M8",
+    "priority": "P0",
+    "description": "QSR apportioned between free estate and settled property",
+    "scenario": "Tina died in May 2012 with free estate of £300,000 and life tenancy in settled fund of £200,000 (total £500,000). QSR of £10,000 is available and must be apportioned proportionally between the two parts of her estate."
+  },
+  "input": {
+    "deceased": {
+      "dateOfDeath": "2012-05-20",
+      "domicileStatus": {
+        "type": "uk_domiciled"
+      },
+      "maritalStatus": {
+        "type": "single"
+      },
+      "hasDirectDescendants": false
+    },
+    "assets": [
+      {
+        "id": "asset-1",
+        "type": "financial",
+        "description": "Free estate",
+        "grossValue": "300000",
+        "valuationDate": "2012-05-20",
+        "ownershipShare": "100",
+        "financialType": "investment",
+        "isInTrust": false
+      },
+      {
+        "id": "asset-2",
+        "type": "trust_interest",
+        "description": "Life tenancy in settled fund",
+        "grossValue": "200000",
+        "valuationDate": "2012-05-20",
+        "ownershipShare": "100",
+        "trustType": "life_interest",
+        "trustId": "settled-fund-1"
+      }
+    ],
+    "liabilities": [],
+    "gifts": [],
+    "beneficiaries": [
+      {
+        "id": "ben-1",
+        "name": "Beneficiaries",
+        "relationship": "other",
+        "inheritanceType": "taxable",
+        "specificBequests": [],
+        "residuaryShare": "100"
+      }
+    ],
+    "quickSuccessionRelief": {
+      "previousDeath": "2011-01-15",
+      "taxPaidOnInheritance": "15000",
+      "yearsBeforeDeath": 1.35,
+      "reliefPercentage": "80",
+      "qsrAmount": "10000"
+    },
+    "residence": null,
+    "predecessorEstate": null
+  },
+  "expectedOutput": {
+    "grossEstate": "500000",
+    "netEstate": "500000",
+    "totalReliefs": "0",
+    "totalExemptions": "0",
+    "chargeableEstate": "500000",
+    "basicNrb": "325000",
+    "availableThreshold": "325000",
+    "taxableAmount": "175000",
+    "taxBeforeQsr": "70000",
+    "qsrAmount": "10000",
+    "freeEstatePortion": "300000",
+    "settledPropertyPortion": "200000",
+    "freeEstateTaxBeforeQsr": "42000",
+    "settledPropertyTaxBeforeQsr": "28000",
+    "freeEstateQsr": "6000",
+    "settledPropertyQsr": "4000",
+    "freeEstateFinalTax": "36000",
+    "settledPropertyFinalTax": "24000",
+    "totalTaxPayable": "60000"
+  },
+  "calculationNotes": [
+    "Tina died May 2012 with two-part estate",
+    "Free estate: £300,000",
+    "Settled fund (life interest): £200,000",
+    "Total: £500,000",
+    "",
+    "Step 1: Calculate tax before QSR",
+    "Chargeable estate: £500,000",
+    "Less NRB: £325,000",
+    "Taxable: £175,000",
+    "Tax at 40%: £70,000",
+    "",
+    "Step 2: Apportion tax between estate parts (by value)",
+    "Free estate proportion: £300,000 / £500,000 = 60%",
+    "Settled property proportion: £200,000 / £500,000 = 40%",
+    "",
+    "Free estate tax: £70,000 × 60% = £42,000",
+    "Settled property tax: £70,000 × 40% = £28,000",
+    "",
+    "Step 3: Apportion QSR (also by value proportion)",
+    "Total QSR available: £10,000",
+    "",
+    "Free estate QSR: £10,000 × 60% = £6,000",
+    "Settled property QSR: £10,000 × 40% = £4,000",
+    "",
+    "Step 4: Calculate final tax",
+    "Free estate: £42,000 - £6,000 = £36,000",
+    "Settled property: £28,000 - £4,000 = £24,000",
+    "Total tax: £36,000 + £24,000 = £60,000",
+    "",
+    "Key principle: QSR is apportioned by relative values when estate has multiple titles"
+  ],
+  "hmrcQuote": "Tina died in May 2012 with a free estate of £300,000 and was life tenant of a settled fund of £200,000, with QSR of £10,000 due. The total tax after QSR was £60,000. Free estate portion: (£300,000 ÷ £500,000) × £60,000 = £36,000. Settled property portion: (£200,000 ÷ £500,000) × £60,000 = £24,000."
+}

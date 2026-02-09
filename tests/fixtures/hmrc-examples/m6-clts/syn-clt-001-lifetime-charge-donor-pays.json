@@ -1,0 +1,109 @@
+{
+  "source": {
+    "type": "synthetic",
+    "reference": "SYN-CLT-001",
+    "title": "CLT lifetime charge with grossing-up (donor pays tax)",
+    "url": "N/A - Synthetic test case",
+    "dateAccessed": "2026-02-08",
+    "rationale": "No official HMRC example found for CLT lifetime charge calculation with grossing-up. This is a critical gap for M6 milestone."
+  },
+  "testCase": {
+    "id": "SYN-CLT-001",
+    "milestone": "M6",
+    "priority": "P0",
+    "description": "CLT into discretionary trust with donor paying the 20% lifetime tax (requires grossing-up)",
+    "scenario": "Settlor makes a gift of £400,000 into a discretionary trust on 1 June 2018. No previous gifts. Donor pays the IHT at the 20% lifetime rate. Since donor pays, the transfer value must be grossed up."
+  },
+  "input": {
+    "deceased": {
+      "dateOfDeath": "2024-01-15",
+      "domicileStatus": {
+        "type": "uk_domiciled"
+      },
+      "maritalStatus": {
+        "type": "single"
+      },
+      "hasDirectDescendants": false
+    },
+    "assets": [],
+    "liabilities": [],
+    "gifts": [
+      {
+        "id": "gift-1",
+        "giftType": "clt",
+        "dateOfGift": "2018-06-01",
+        "value": "400000",
+        "recipient": {
+          "type": "trust",
+          "name": "Family Discretionary Trust",
+          "relationship": "n/a"
+        },
+        "description": "Gift into discretionary trust",
+        "isGiftWithReservation": false,
+        "trustDetails": {
+          "trustType": "discretionary",
+          "trustId": "family-trust-1"
+        },
+        "taxPaidAtTransfer": "18750",
+        "paidByDonor": true
+      }
+    ],
+    "beneficiaries": [],
+    "residence": null,
+    "predecessorEstate": null
+  },
+  "expectedOutput": {
+    "grossEstate": "0",
+    "netEstate": "0",
+    "cltCalculation": {
+      "netGiftValue": "400000",
+      "nrbAvailable": "325000",
+      "excessOverNrb": "75000",
+      "lifetimeRate": "20",
+      "donorPays": true,
+      "grossingUpRequired": true,
+      "grossedUpExcess": "93750",
+      "taxPaidByDonor": "18750",
+      "grossedUpTransferValue": "418750",
+      "yearsToDeathFromGift": 5.62,
+      "withinSevenYears": true,
+      "deathWithinSevenYears": false
+    },
+    "totalTaxPayable": "0"
+  },
+  "calculationNotes": [
+    "LIFETIME CHARGE AT TRANSFER (2018)",
+    "",
+    "Step 1: Determine chargeable amount",
+    "Gift into trust: £400,000",
+    "NRB available: £325,000 (2018-19)",
+    "Excess over NRB: £400,000 - £325,000 = £75,000",
+    "",
+    "Step 2: Check who pays tax",
+    "Donor pays: YES → Grossing-up required",
+    "Lifetime rate: 20%",
+    "",
+    "Step 3: Gross up the excess",
+    "The £75,000 is NET (after tax would be deducted)",
+    "Gross amount = Net / (1 - rate) = £75,000 / 0.8 = £93,750",
+    "",
+    "Step 4: Calculate tax",
+    "Tax = Gross × Rate = £93,750 × 20% = £18,750",
+    "This is paid by donor IN ADDITION to the £400,000",
+    "",
+    "Step 5: Record grossed-up transfer value",
+    "For cumulation purposes: £325,000 (NRB) + £93,750 (grossed) = £418,750",
+    "",
+    "DEATH ANALYSIS (2024)",
+    "Gift made: 1 June 2018",
+    "Death: 15 January 2024",
+    "Years: 5.62 years (within 7 years)",
+    "",
+    "Since death occurred 5-7 years after CLT:",
+    "- Taper relief would apply if additional tax due",
+    "- In this example, no death estate, so only the lifetime charge applies",
+    "",
+    "If there were an estate, the £418,750 would reduce available NRB"
+  ],
+  "hmrcQuote": "N/A - Synthetic case. Based on IHTA 1984 s.7(2) and s.64 regarding grossing-up when donor pays tax on CLT at the 20% lifetime rate."
+}

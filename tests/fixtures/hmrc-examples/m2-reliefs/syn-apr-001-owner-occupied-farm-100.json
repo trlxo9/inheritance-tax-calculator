@@ -1,0 +1,173 @@
+{
+  "source": {
+    "type": "synthetic",
+    "reference": "SYN-APR-001",
+    "title": "Agricultural Property Relief 100% - Owner-occupied farmland",
+    "url": "N/A - Synthetic test case",
+    "dateAccessed": "2026-02-08",
+    "rationale": "HMRC references APR extensively but no complete worked calculation example found. Owner-occupied farm is the most common APR scenario."
+  },
+  "testCase": {
+    "id": "SYN-APR-001",
+    "milestone": "M2",
+    "priority": "P0",
+    "description": "Owner-occupied farmland and farmhouse qualifying for 100% APR",
+    "scenario": "Deceased owned and farmed 150-acre farm for 12 years. Agricultural value £800,000 (land £600k, farmhouse £200k). Market value £1,000,000 (includes development hope value). APR applies only to agricultural value."
+  },
+  "input": {
+    "deceased": {
+      "dateOfDeath": "2021-08-10",
+      "domicileStatus": {
+        "type": "uk_domiciled"
+      },
+      "maritalStatus": {
+        "type": "single"
+      },
+      "hasDirectDescendants": true
+    },
+    "assets": [
+      {
+        "id": "asset-1",
+        "type": "agricultural",
+        "description": "150-acre owner-occupied farmland",
+        "grossValue": "600000",
+        "valuationDate": "2021-08-10",
+        "ownershipShare": "100",
+        "agriculturalType": "farmland",
+        "aprEligibility": {
+          "qualifies": true,
+          "reliefRate": 100,
+          "reason": "Owner-occupied for 2+ years"
+        },
+        "agriculturalValue": "600000",
+        "occupationType": "owner_occupied",
+        "ownershipDuration": 12
+      },
+      {
+        "id": "asset-2",
+        "type": "agricultural",
+        "description": "Farmhouse (character appropriate)",
+        "grossValue": "400000",
+        "valuationDate": "2021-08-10",
+        "ownershipShare": "100",
+        "agriculturalType": "farmhouse",
+        "aprEligibility": {
+          "qualifies": true,
+          "reliefRate": 100,
+          "reason": "Character appropriate farmhouse"
+        },
+        "agriculturalValue": "200000",
+        "occupationType": "owner_occupied",
+        "ownershipDuration": 12
+      },
+      {
+        "id": "asset-3",
+        "type": "financial",
+        "description": "Farm bank account and equipment",
+        "grossValue": "100000",
+        "valuationDate": "2021-08-10",
+        "ownershipShare": "100",
+        "financialType": "bank_account",
+        "isInTrust": false
+      }
+    ],
+    "liabilities": [],
+    "gifts": [],
+    "beneficiaries": [
+      {
+        "id": "ben-1",
+        "name": "Son (continuing to farm)",
+        "relationship": "child",
+        "inheritanceType": "taxable",
+        "specificBequests": [],
+        "residuaryShare": "100"
+      }
+    ],
+    "residence": null,
+    "predecessorEstate": null
+  },
+  "expectedOutput": {
+    "grossEstate": "1100000",
+    "netEstate": "1100000",
+    "aprDetails": [
+      {
+        "assetId": "asset-1",
+        "assetDescription": "150-acre owner-occupied farmland",
+        "marketValue": "600000",
+        "agriculturalValue": "600000",
+        "reliefRate": 100,
+        "reliefAmount": "600000",
+        "netValue": "0"
+      },
+      {
+        "assetId": "asset-2",
+        "assetDescription": "Farmhouse",
+        "marketValue": "400000",
+        "agriculturalValue": "200000",
+        "reliefRate": 100,
+        "reliefAmount": "200000",
+        "nonAgriculturalValue": "200000",
+        "netValue": "200000"
+      }
+    ],
+    "totalApr": "800000",
+    "totalReliefs": "800000",
+    "chargeableEstate": "300000",
+    "basicNrb": "325000",
+    "availableThreshold": "325000",
+    "taxableAmount": "0",
+    "totalTaxPayable": "0"
+  },
+  "calculationNotes": [
+    "AGRICULTURAL PROPERTY RELIEF - OWNER-OCCUPIED",
+    "",
+    "Step 1: Identify qualifying agricultural property",
+    "Asset 1: Farmland (150 acres)",
+    "- Market value: £600,000",
+    "- Agricultural value: £600,000 (same as market)",
+    "- Occupation: Owner-occupied for 12 years",
+    "- Requirement: Minimum 2 years for owner-occupied ✓",
+    "",
+    "Asset 2: Farmhouse",
+    "- Market value: £400,000",
+    "- Agricultural value: £200,000",
+    "- Excess £200,000 is 'hope value' for development",
+    "- Character: Appropriate to farm ✓",
+    "",
+    "Step 2: Check APR eligibility",
+    "Requirements for 100% APR:",
+    "✓ Property used for agricultural purposes",
+    "✓ Owner-occupied for at least 2 years",
+    "✓ Farmhouse character appropriate to size/nature of farm",
+    "",
+    "Step 3: Apply APR to agricultural value ONLY",
+    "Farmland:",
+    "- Agricultural value: £600,000",
+    "- APR at 100%: £600,000",
+    "- Net value: £0",
+    "",
+    "Farmhouse:",
+    "- Market value: £400,000",
+    "- Agricultural value: £200,000",
+    "- APR applies to: £200,000 (agricultural value only)",
+    "- APR at 100%: £200,000",
+    "- Remaining (development value): £200,000 (taxable)",
+    "",
+    "Step 4: Calculate total estate",
+    "Gross estate: £600k + £400k + £100k = £1,100,000",
+    "Less APR: £800,000",
+    "Chargeable estate: £300,000",
+    "",
+    "Step 5: Calculate tax",
+    "Chargeable: £300,000",
+    "NRB: £325,000",
+    "Below threshold: No tax",
+    "",
+    "KEY POINTS:",
+    "- APR applies to agricultural value only",
+    "- Development/hope value is taxable",
+    "- Farmhouse must be 'character appropriate'",
+    "- Owner-occupied needs only 2 years vs 7 years for let property"
+  ],
+  "hmrcQuote": "N/A - Synthetic case. Based on IHTA 1984 s.115-124C providing 100% APR for agricultural property occupied by owner for agricultural purposes for at least 2 years before transfer, with relief limited to agricultural value."
+}

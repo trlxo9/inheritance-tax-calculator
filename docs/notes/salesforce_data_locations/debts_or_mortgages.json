@@ -1,0 +1,18 @@
+[
+  {
+    "Plan Type":"Mortgage",
+    "Account Tab":"Financials",
+    "Salesforce Section Used to Identify":"Mortgage and Loan Accounts",
+    "Field used to Identify":"Product",
+    "Values Required":"Mortgage, Repayment Mortgage, Interest Only Mortgage, Lifetime Mortgage, Buy to Let interest only Mortgage",
+    "Other Filters":"Mortgage affects IHT"
+  },
+  {
+    "Plan Type":"Loan",
+    "Account Tab":"Financials",
+    "Salesforce Section Used to Identify":"Mortgage and Loan Accounts",
+    "Field used to Identify":"Product",
+    "Values Required":"Personal Loan, Commercial Loan, Credit Card",
+    "Other Filters":""
+    }
+  ]
