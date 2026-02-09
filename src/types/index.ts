@@ -56,3 +56,9 @@ export type {
   AuditEntry,
   ValidationError,
 } from './results';
+export type {
+  TenYearChargeInput,
+  TenYearChargeResult,
+  ExitChargeInput,
+  ExitChargeResult,
+} from './trusts';
